@@ -1,26 +1,19 @@
 'use client';
 
-import useSWRSubscription from 'swr/subscription'
+import useOBD from './hooks/useOBD';
 
 
 export default function Home() {
-  const { data, error } = useSWRSubscription('ws://0.0.0.0:8765', (key, { next }) => {
-    const socket = new WebSocket(key)
-    socket.addEventListener('message', (event) => next(null, event.data))
-    socket.addEventListener('error', (event) => next((event as ErrorEvent).message))
-
-    return () => socket.close()
-  });
+  const { timestamp, pids, error, isLoading } = useOBD();
 
   if (error) return <div>failed to load</div>
-  if (!data) return <div>loading...</div>
-
-  const { timestamp, pids }: { timestamp: number; pids: Record<string, string> } = JSON.parse(data);
+  if (isLoading) return <div>loading...</div>
 
   return (
     <div className="">
       <div>{timestamp}</div>
-      {Object.entries(pids).map(([key, value]) => (
+      <div>PIDs: {pids.length}</div>
+      {pids.map(([key, value]) => (
         <div key={key}>
           {key}: {value}
         </div>
