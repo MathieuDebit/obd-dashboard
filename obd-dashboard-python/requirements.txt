@@ -1,0 +1,4 @@
+obd @ git+https://github.com/brendan-w/python-OBD.git
+websockets
+asyncio
+ELM327-emulator
