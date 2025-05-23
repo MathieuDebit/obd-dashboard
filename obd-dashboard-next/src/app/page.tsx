@@ -2,7 +2,8 @@
 
 import RadialChart from "@/components/custom/RadialChart";
 import { ChartConfig } from "@/components/ui/chart";
-import useOBD from "./hooks/useOBD";
+import useOBD from "@/app/hooks/useOBD";
+import Map from "@/components/custom/Map";
 
 
 const chartConfig = {
@@ -22,9 +23,13 @@ export default function Home() {
   ]
 
   return (
-    <div className="">
-      <div className="w-[200px]">
-        <RadialChart chartData={chartData} chartConfig={chartConfig} />
+    <div  >
+      <Map />
+
+      <div className="absolute w-full h-full p-10 border-20 border-solid border-white">
+        <div className="w-[200px]">
+          <RadialChart chartData={chartData} chartConfig={chartConfig} />
+        </div>
       </div>
     </div>
   );
