@@ -34,5 +34,5 @@ export default function Map() {
     }
   }, []);
 
-  return <div id="mapId" className="absolute top-0 z-0 w-full h-full"></div>;
+  return <div id="mapId" className="absolute top-0 left-0 z-0 w-full h-full"></div>;
 }

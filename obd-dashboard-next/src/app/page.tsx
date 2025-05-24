@@ -29,7 +29,7 @@ export default function Home() {
     <div  >
       <Map />
 
-      <div className="absolute w-full h-full p-10 border-20 border-solid border-white pointer-events-none">
+      <div className="absolute w-full h-full p-10 pointer-events-none">
         <div className="w-100 h-100 pointer-events-auto">
           <Card className="pb-0">
             <CardContent className="flex items-start justify-around pb-0 w-full">
