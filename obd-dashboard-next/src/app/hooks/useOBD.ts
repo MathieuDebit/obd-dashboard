@@ -1,8 +1,10 @@
 import useSWRSubscription from "swr/subscription";
+import { OBD_COMMANDS } from "../utils/formatOBD";
 
 export type Command = {
   pid: string,
-  formatted: string,
+  rawValue: string,
+  name: string,
   value: string
 }
 
@@ -22,17 +24,22 @@ export default function useOBD() {
 
   const commands: Command[] = [];
 
-  for (const [pid, value] of Object.entries(pids)) {
-    commands.push({
-      pid,
-      formatted: 'formatted value',
-      value
-    });
+  for (const [pid, rawValue] of Object.entries(pids)) {
+    const command = OBD_COMMANDS[pid];
+    
+    if (command) {
+      commands.push({
+        pid,
+        rawValue,
+        name: command.name,
+        value: command.formatValue(rawValue),
+      });
+    }
   }
 
   return {
     timestamp,
-    pids: commands,
+    pids: commands.sort((a, b) => a.name.localeCompare(b.name)),
     error,
     isLoading: !data,
   }
