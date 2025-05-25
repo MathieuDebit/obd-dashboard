@@ -5,11 +5,12 @@ import { Command } from "../hooks/useOBD"
 
 export const columns: ColumnDef<Command>[] = [
   {
-    accessorKey: "pid",
-    header: () => "PID",
+    accessorKey: "name",
+    header: "Commands",
   },
   {
     accessorKey: "value",
-    header: "Value"
+    header: "",
+    cell: ({ row }) => <div className="text-right font-medium">{row.getValue('value')}</div>
   }
 ]

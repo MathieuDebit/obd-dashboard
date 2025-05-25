@@ -75,7 +75,7 @@ function Car({ bodyColor, detailsColor, glassColor } : { bodyColor: string, deta
     const t = -state.clock.getElapsedTime()
     wheelMeshes.forEach(wheel => {
       if (wheel) {
-        wheel.rotation.x = t * Math.PI * 2
+        wheel.rotation.x = t * Math.PI * 0.7
       }
     })
   })
@@ -91,7 +91,7 @@ function AnimatedGrid() {
       gridRef.current.position.z = -(t % 1)
     }
   })
-  return <gridHelper ref={gridRef} args={[20, 40]} />
+  return <gridHelper ref={gridRef} args={[20, 40, 'white', 'white']} />
 }
 
 export default function Page() {
@@ -106,12 +106,22 @@ export default function Page() {
         camera={{ position: [4.25, 1.4, -4.5], fov: 40 }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.85 }}
       >
-        <color attach="background" args={[0x333333]} />
-        <fog attach="fog" args={[0x333333, 10, 15]} />
+        <color attach="background" args={[0xcccccc]} />
+        <fog attach="fog" args={[0xcccccc, 10, 15]} />
         <Environment files="/textures/equirectangular/venice_sunset_1k.hdr" />
         <Car bodyColor={bodyColor} detailsColor={detailsColor} glassColor={glassColor} />
         <AnimatedGrid />
-        <OrbitControls maxDistance={9} maxPolarAngle={Math.PI / 2} target={[0, 0.5, 0]} />
+        <OrbitControls
+          autoRotate
+          autoRotateSpeed={-2}
+          enableDamping
+          dampingFactor={0.05}
+          minDistance={3}
+          maxDistance={10}
+          minPolarAngle={Math.PI/6}  
+          maxPolarAngle={Math.PI/2}
+          target={[0, 0.5, 0]}
+        />
       </Canvas>
     </>
   )
