@@ -1,19 +1,9 @@
-import { cn } from "@/utils/classNames"
-import { ComponentProps, ComponentType, createContext, CSSProperties, ReactNode, useContext, useId, useMemo } from "react"
+import { ComponentProps, createContext, CSSProperties, useContext, useId, useMemo } from "react"
 import { Legend, LegendProps, ResponsiveContainer, Tooltip } from "recharts"
+import { ChartConfig } from "@/types/chart"
+import { cn } from "@/utils/classNames"
+import { THEMES } from "@/ui/css/utils"
 
-// Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: "", dark: ".dark" } as const
-
-export type ChartConfig = {
-  [k in string]: {
-    label?: ReactNode
-    icon?: ComponentType
-  } & (
-    | { color?: string; theme?: never }
-    | { color?: never; theme: Record<keyof typeof THEMES, string> }
-  )
-}
 
 type ChartContextProps = {
   config: ChartConfig

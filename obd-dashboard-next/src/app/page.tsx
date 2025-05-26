@@ -1,9 +1,9 @@
 'use client';
 
-import { ChartConfig } from "@/ui/chart";
 import useOBD from "@/hooks/useOBD";
 import Map from "@/components/Map";
 import GPSCarData from "@/components/GPSCarData";
+import { ChartConfig, ChartData } from "@/types/chart";
 
 
 const chartConfig = {
@@ -15,10 +15,10 @@ export default function Home() {
   if (error) return <div>failed to load</div>
   if (isLoading) return <div>loading...</div>
 
-  const speed = pids.filter((command) => command.pid === 'SPEED')[0]?.rawValue || 1;
-  const rpm = pids.filter((command) => command.pid === 'RPM')[0]?.rawValue   || 0;
+  const speed = Number(pids.filter((command) => command.pid === 'SPEED')[0]?.rawValue) || 1;
+  const rpm = Number(pids.filter((command) => command.pid === 'RPM')[0]?.rawValue) || 0;
 
-  const chartData = [
+  const chartData: ChartData = [
     { speed, rpm },
   ]
 

@@ -7,10 +7,17 @@ import {
   RadialBarChart,
 } from "recharts";
 import { cn } from "@/utils/classNames"
-import { ChartConfig, ChartContainer } from "@/ui/chart"
+import { ChartContainer } from "@/ui/chart"
+import { ChartConfig } from "@/types/chart";
 
 
-export default function RadialChart({ className, chartData, chartConfig }: { className: string, chartData: any[], chartConfig: ChartConfig}) {
+interface RadialChartProps {
+  className: string,
+  chartData: any[],
+  chartConfig: ChartConfig,
+}
+
+export default function RadialChart({ className, chartData, chartConfig }: RadialChartProps) {
   return (
     <ChartContainer
       config={chartConfig}

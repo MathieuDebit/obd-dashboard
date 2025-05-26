@@ -1,22 +1,33 @@
-const formatCommandsValue = {
-    pct   : v => `${v.toFixed(1)} %`,
-    rpm   : v => `${v.toFixed(0)} tr/min`,
-    kmh   : v => `${v.toFixed(0)} km/h`,
-    tempC : v => `${v.toFixed(0)} °C`,
-    g_s   : v => `${v.toFixed(2)} g/s`,
-    volt  : v => `${v.toFixed(2)} V`,
-    sec   : v => `${v.toFixed(0)} s`,
-    dist  : v => `${v.toFixed(0)} km`,
-    kPa   : v => `${v.toFixed(2)} kPa`,
-    BTDC  : v => `${v.toFixed(1)} ° BTDC`,
-    mA    : v => `${v.toFixed(2)} mA`,
+type FormatValue = (v: string) => string;
+
+type FormatCommandsValue = Record<string, FormatValue>;
+
+type ObdCommands = {
+    [key: string]: {
+        name: string;
+        formatValue: FormatValue;
+    }
+};
+
+const formatCommandsValue: FormatCommandsValue = {
+    pct   : v => `${Number(v).toFixed(1)} %`,
+    rpm   : v => `${Number(v).toFixed(0)} tr/min`,
+    kmh   : v => `${Number(v).toFixed(0)} km/h`,
+    tempC : v => `${Number(v).toFixed(0)} °C`,
+    g_s   : v => `${Number(v).toFixed(2)} g/s`,
+    volt  : v => `${Number(v).toFixed(2)} V`,
+    sec   : v => `${Number(v).toFixed(0)} s`,
+    dist  : v => `${Number(v).toFixed(0)} km`,
+    kPa   : v => `${Number(v).toFixed(2)} kPa`,
+    BTDC  : v => `${Number(v).toFixed(1)} ° BTDC`,
+    mA    : v => `${Number(v).toFixed(2)} mA`,
 
     raw   : v => v,
     str   : v => `${v}`,
     byteA : v => v,
 };
 
-export const OBD_COMMANDS = {
+export const OBD_COMMANDS: ObdCommands = {
     RPM:                            { name: 'Régime moteur',            formatValue: formatCommandsValue.rpm  },
     SPEED:                          { name: 'Vitesse véhicule',         formatValue: formatCommandsValue.kmh  },
     COOLANT_TEMP:                   { name: 'Temp. liquide',            formatValue: formatCommandsValue.tempC },

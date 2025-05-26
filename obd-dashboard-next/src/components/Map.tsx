@@ -4,21 +4,17 @@ import { useEffect, useRef } from 'react';
 import * as L from 'leaflet';
 
 export default function Map() {
-  const map = useRef(null);
+  const map = useRef<L.Map>(null);
 
   useEffect(() => {
-    // Check if map is already initialized
     if (!map.current) {
-      // Initialize map
       map.current = L.map('mapId').setView([47.21725000, -1.55336000], 19);
 
-      // Add a tile layer (using OpenStreetMap here)
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         minZoom: 0,
         maxZoom: 20,
       }).addTo(map.current);
 
-      // Adding a marker with custom icon
     L.marker([47.21725000, -1.55336000], {
       icon: L.icon({
         iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png',
