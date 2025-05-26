@@ -1,3 +1,8 @@
+export type OBDServerResponse = {
+  timestamp: number;
+  pids: Record<string, string>
+}
+
 export type Command = {
   pid: string,
   rawValue: string,

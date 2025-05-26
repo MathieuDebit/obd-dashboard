@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useRef, useMemo } from 'react'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'

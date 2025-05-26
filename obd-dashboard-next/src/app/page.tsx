@@ -1,9 +1,11 @@
 'use client';
 
+import dynamic from 'next/dynamic'
 import useOBD from "@/hooks/useOBD";
-import Map from "@/components/Map";
 import GPSCarData from "@/components/GPSCarData";
 import { ChartConfig, ChartData } from "@/types/chart";
+
+const Map = dynamic(() => import('@/components/Map'), { ssr: false })
 
 
 const chartConfig = {

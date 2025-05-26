@@ -8,12 +8,12 @@ import {
 } from "recharts";
 import { cn } from "@/utils/classNames"
 import { ChartContainer } from "@/ui/chart"
-import { ChartConfig } from "@/types/chart";
+import { ChartConfig, ChartData } from "@/types/chart";
 
 
 interface RadialChartProps {
   className: string,
-  chartData: any[],
+  chartData: ChartData,
   chartConfig: ChartConfig,
 }
 

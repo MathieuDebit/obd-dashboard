@@ -1,20 +1,20 @@
-import useSWRSubscription from "swr/subscription";
+import useSWRSubscription, { SWRSubscriptionOptions } from "swr/subscription";
 import { OBD_COMMANDS } from "@/utils/formatOBD";
-import { Commands } from "@/types/commands";
+import { Commands, OBDServerResponse } from "@/types/commands";
 
 export default function useOBD() {
-  const { data = '{}', error } = useSWRSubscription<string, ErrorEvent>(
+  const { data = '{}', error } = useSWRSubscription(
     'ws://0.0.0.0:8765',
-    (key: string, { next }: {next: any}) => {
+    (key: string, { next }: SWRSubscriptionOptions<string, Error>) => {
       const socket = new WebSocket(key)
       socket.addEventListener('message', (event) => next(null, event.data))
-      socket.addEventListener('error', (event) => next((event as ErrorEvent).message))
+      socket.addEventListener('error', () => next(new Error('[useOBD] WebSocket connection error')))
 
       return () => socket.close()
     }
   );
 
-  const { timestamp, pids = {} }: { timestamp: number; pids: Record<string, string> } = JSON.parse(data);
+  const { timestamp, pids = {} }: OBDServerResponse = JSON.parse(data);
 
   const commands: Commands = [];
 
