@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import * as L from 'leaflet';
-import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
 
 export default function Map() {
   const map = useRef(null);

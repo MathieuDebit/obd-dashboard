@@ -1,7 +1,8 @@
 "use client"
 
+import { Command } from "@/types/commands"
 import { ColumnDef } from "@tanstack/react-table"
-import { Command } from "../hooks/useOBD"
+
 
 export const columns: ColumnDef<Command>[] = [
   {

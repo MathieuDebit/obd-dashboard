@@ -1,12 +1,6 @@
 import useSWRSubscription from "swr/subscription";
-import { OBD_COMMANDS } from "../utils/formatOBD";
-
-export type Command = {
-  pid: string,
-  rawValue: string,
-  name: string,
-  value: string
-}
+import { OBD_COMMANDS } from "@/utils/formatOBD";
+import { Commands } from "@/types/commands";
 
 export default function useOBD() {
   const { data = '{}', error } = useSWRSubscription<string, ErrorEvent>(
@@ -22,7 +16,7 @@ export default function useOBD() {
 
   const { timestamp, pids = {} }: { timestamp: number; pids: Record<string, string> } = JSON.parse(data);
 
-  const commands: Command[] = [];
+  const commands: Commands = [];
 
   for (const [pid, rawValue] of Object.entries(pids)) {
     const command = OBD_COMMANDS[pid];

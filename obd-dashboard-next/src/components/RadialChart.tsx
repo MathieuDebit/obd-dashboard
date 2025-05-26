@@ -5,10 +5,10 @@ import {
   PolarRadiusAxis,
   RadialBar,
   RadialBarChart,
-} from "recharts"
+} from "recharts";
+import { cn } from "@/utils/classNames"
+import { ChartConfig, ChartContainer } from "@/ui/chart"
 
-import { ChartConfig, ChartContainer } from "@/components/ui/chart"
-import { cn } from "@/lib/utils"
 
 export default function RadialChart({ className, chartData, chartConfig }: { className: string, chartData: any[], chartConfig: ChartConfig}) {
   return (

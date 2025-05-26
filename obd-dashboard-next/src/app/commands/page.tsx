@@ -1,8 +1,8 @@
 'use client'
 
-import { DataTable } from "./data-table";
+import { DataTable } from "@/ui/data-table";
+import useOBD from "@/hooks/useOBD";
 import { columns } from "./columns";
-import useOBD from "@/app/hooks/useOBD";
 
 export default function CommandsPage() {
     const { pids, error, isLoading } = useOBD();
