@@ -3,7 +3,8 @@ import { ComponentType, ReactNode } from "react"
 
 export type ChartData = {
   speed: number
-  rpm: number
+  rpm: number,
+  fill: string,
 }[]
 
 export type ChartConfig = {

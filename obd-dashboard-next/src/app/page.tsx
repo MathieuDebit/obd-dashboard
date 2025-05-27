@@ -20,8 +20,11 @@ export default function Home() {
   const speed = Number(pids.filter((command) => command.pid === 'SPEED')[0]?.rawValue) || 1;
   const rpm = Number(pids.filter((command) => command.pid === 'RPM')[0]?.rawValue) || 0;
 
+  const styles = getComputedStyle(document.documentElement);
+  const bgMuted = styles.getPropertyValue("--foreground");
+
   const chartData: ChartData = [
-    { speed, rpm },
+    { speed, rpm, fill: bgMuted },
   ]
 
   return (

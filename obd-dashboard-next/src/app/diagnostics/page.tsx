@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect, useState } from 'react'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import { GLTFLoader } from 'three-stdlib'
@@ -18,14 +18,15 @@ import {
   Group,
   GridHelper,
 } from 'three'
+import Colorjs from 'colorjs.io';
 
 interface CarProps {
-  bodyColor: string
-  detailsColor: string
-  glassColor: string
+  carBodyColor: string
+  carDetailsColor: string
+  carGlassColor: string
 }
 
-function Car({ bodyColor, detailsColor, glassColor }: CarProps) {
+function Car({ carBodyColor, carDetailsColor, carGlassColor }: CarProps) {
   const carRef = useRef<Group>(null!)
 
   const gltf = useLoader(GLTFLoader, '/models/gltf/ferrari.glb', loader => {
@@ -40,19 +41,19 @@ function Car({ bodyColor, detailsColor, glassColor }: CarProps) {
     const scene = gltf.scene.clone(true) as Group
 
     const bodyMat = new MeshPhysicalMaterial({
-      color: new Color(bodyColor),
+      color: new Color(carBodyColor),
       metalness: 1,
       roughness: 0.5,
       clearcoat: 1,
       clearcoatRoughness: 0.03,
     })
     const detailsMat = new MeshStandardMaterial({
-      color: new Color(detailsColor),
+      color: new Color(carDetailsColor),
       metalness: 1,
       roughness: 0.5,
     })
     const glassMat = new MeshPhysicalMaterial({
-      color: new Color(glassColor),
+      color: new Color(carGlassColor),
       metalness: 0.25,
       roughness: 0,
       transmission: 1,
@@ -87,36 +88,57 @@ function Car({ bodyColor, detailsColor, glassColor }: CarProps) {
     scene.add(plane)
 
     return [scene, wheels] as const
-  }, [gltf, bodyColor, detailsColor, glassColor, shadowTexture])
+  }, [gltf, carBodyColor, carDetailsColor, carGlassColor, shadowTexture])
 
   useFrame(state => {
     const t = -state.clock.getElapsedTime()
     wheelMeshes.forEach(wheel => {
-      wheel.rotation.x = t * Math.PI * 0.7
+      wheel.rotation.x = t * Math.PI * 0.7 * 0
     })
   })
 
   return <primitive ref={carRef} object={sceneClone} />
 }
 
-function AnimatedGrid() {
+interface AnimatedGridProps {
+  size: number;
+  divisions: number;
+  colorCenterLine: string;
+  colorGrid: string;
+}
+
+function AnimatedGrid({ size, divisions, colorCenterLine, colorGrid }: AnimatedGridProps) {
   const gridRef = useRef<GridHelper>(null!)
 
   useFrame(state => {
     const t = -state.clock.getElapsedTime()
 
     if (gridRef.current) {
-      gridRef.current.position.z = -(t % 1)
+      gridRef.current.position.z = -(t % 1) * 0
     }
   })
 
-  return <gridHelper ref={gridRef} args={[20, 40, 'white', 'white']} />
+  return <gridHelper ref={gridRef} args={[size, divisions, colorCenterLine, colorGrid]} />
 }
 
+const colorToHex = (color: string) => new Colorjs(color).to('srgb').toString({ format: 'hex' });
+
 export default function Page() {
-  const bodyColor = '#ff0000';
-  const detailsColor = '#ffffff';
-  const glassColor = '#ffffff';
+  const [background, setBackground] = useState('');
+  const [foreground, setForeground] = useState('');
+
+  useEffect(() => {
+    const styles = getComputedStyle(document.documentElement);
+    const bgColor = colorToHex(styles.getPropertyValue("--sidebar-ring"));
+    const fgColor = colorToHex(styles.getPropertyValue("--muted"));
+
+    setBackground(bgColor);
+    setForeground(fgColor);
+  }, []);
+
+  const carBodyColor = '#ff0000';
+  const carDetailsColor = '#ffffff';
+  const carGlassColor = '#ffffff';
 
   return (
     <Canvas
@@ -124,11 +146,9 @@ export default function Page() {
       camera={{ position: [4.25, 1.4, -4.5], fov: 40 }}
       gl={{ antialias: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 0.85 }}
     >
-      <color attach="background" args={[0xcccccc]} />
-      <fog attach="fog" args={[0xcccccc, 10, 15]} />
+      <color attach="background" args={[background]} />
       <Environment files="/textures/equirectangular/venice_sunset_1k.hdr" />
-      <Car bodyColor={bodyColor} detailsColor={detailsColor} glassColor={glassColor} />
-      <AnimatedGrid />
+      <Car carBodyColor={carBodyColor} carDetailsColor={carDetailsColor} carGlassColor={carGlassColor} />
       <OrbitControls
         autoRotate
         autoRotateSpeed={-2}

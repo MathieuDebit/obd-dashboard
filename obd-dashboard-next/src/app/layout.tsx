@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { geistSans, geistMono } from "@/ui/fonts";
-import { ScrollArea } from "@/ui/scroll-area";
-import Nav from "@/ui/nav";
+import HTML from "@/app/html";
 import '@/ui/css/globals.css';
+import { ThemeProvider } from "@/app/ThemeContext";
 
 
 export const metadata: Metadata = {
@@ -16,18 +15,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-100`}
-      >
-        <div className="flex flex-row h-screen p-3">
-          <Nav />
-
-          <ScrollArea className="bg-white flex grow rounded-xl border p-4 overflow-hidden">
-            {children}
-          </ScrollArea>
-        </div>
-      </body>
-    </html>
+    <ThemeProvider>
+      <HTML>
+        {children}
+      </HTML>
+    </ThemeProvider>
   );
 }
