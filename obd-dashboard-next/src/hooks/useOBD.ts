@@ -1,26 +1,36 @@
+import { useCallback } from "react";
 import useSWRSubscription, { SWRSubscriptionOptions } from "swr/subscription";
 import { OBD_COMMANDS } from "@/utils/formatOBD";
 import { Commands, OBDServerResponse } from "@/types/commands";
 
 export default function useOBD() {
-  const { data = '{}', error } = useSWRSubscription(
-    'ws://0.0.0.0:8765',
-    (key: string, { next }: SWRSubscriptionOptions<string, Error>) => {
-      const socket = new WebSocket(key)
-      socket.addEventListener('message', (event) => next(null, event.data))
-      socket.addEventListener('error', () => next(new Error('[useOBD] WebSocket connection error')))
+  const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8765";
 
-      return () => socket.close()
-    }
-  );
+  const subscriber = useCallback(
+    (key: string, { next }: SWRSubscriptionOptions<string, Error>) => {
+      const socket = new WebSocket(key);
+
+      socket.addEventListener("open", () =>
+        console.log("[useOBD] WebSocket connected")
+      );
+      socket.addEventListener("message", (event) => next(null, event.data));
+      socket.addEventListener("error", () =>
+        console.log(new Error("[useOBD] WebSocket connection error"))
+      );
+
+      return () => {
+        console.log("[useOBD] Closing WebSocket");
+        socket.close();
+      };
+    }, []);
+
+  const { data = "{}", error } = useSWRSubscription(WS_URL, subscriber);
 
   const { timestamp, pids = {} }: OBDServerResponse = JSON.parse(data);
-
   const commands: Commands = [];
 
   for (const [pid, rawValue] of Object.entries(pids)) {
     const command = OBD_COMMANDS[pid];
-    
     if (command) {
       commands.push({
         pid,
