@@ -10,7 +10,7 @@ export default function Map() {
 
   useEffect(() => {
     if (!map.current) {
-      map.current = L.map('mapId').setView([47.21725000, -1.55336000], 19);
+      map.current = L.map('OBDMap', { zoomControl:false, attributionControl: false }).setView([47.21725000, -1.55336000], 19);
 
       L.tileLayer(`https://{s}.basemaps.cartocdn.com/${theme}_all/{z}/{x}/{y}{r}.png`, {
         minZoom: 0,
@@ -31,5 +31,5 @@ export default function Map() {
     }
   }, [theme]);
 
-  return <div id="mapId" className="absolute top-0 left-0 z-0 w-full h-full"></div>;
+  return <div id="OBDMap" className="absolute top-0 left-0 z-0 w-full h-full"></div>;
 }
