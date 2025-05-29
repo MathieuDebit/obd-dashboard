@@ -37,6 +37,7 @@ export default function useOBD() {
         rawValue,
         name: command.name,
         value: command.formatValue(rawValue),
+        description: command.description,
       });
     }
   }
