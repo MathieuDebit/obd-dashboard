@@ -1,0 +1,13 @@
+.dark {
+  .leaflet-routing-container {
+    background-color: var(--background);
+  }
+
+  .leaflet-routing-icon {
+    background-color: var(--background);
+  }
+}
+
+.leaflet-touch .leaflet-bar {
+    border: none;
+}

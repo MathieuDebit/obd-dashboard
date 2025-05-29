@@ -1,35 +1,48 @@
-'use client';
+"use client";
 
-import { useContext, useEffect, useRef } from 'react';
-import * as L from 'leaflet';
+import { useContext } from "react";
+import dynamic from "next/dynamic";
+import { Card, CardContent } from "@/ui/card";
 import { ThemeContext } from '@/app/ThemeContext';
 
-export default function Map() {
-  const map = useRef<L.Map>(null);
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+
+const Routing = dynamic(() => import("./Routing"), {
+  ssr: false,
+});
+
+
+export default function MapRoute() {
   const { theme } = useContext(ThemeContext);
 
-  useEffect(() => {
-    if (!map.current) {
-      map.current = L.map('OBDMap', { zoomControl:false, attributionControl: false }).setView([47.21725000, -1.55336000], 19);
+  return (
+    <div>
+      <MapContainer
+        className="absolute top-0 left-0 z-0 w-full h-full"
+        center={[47.21725000, -1.55336000]}
+        zoom={19}
+        scrollWheelZoom={true}
+        zoomControl={false}
+        attributionControl={false}
+      >
+        <TileLayer
+          url={`https://{s}.basemaps.cartocdn.com/${theme}_all/{z}/{x}/{y}{r}.png`}
+        />
 
-      L.tileLayer(`https://{s}.basemaps.cartocdn.com/${theme}_all/{z}/{x}/{y}{r}.png`, {
-        minZoom: 0,
-        maxZoom: 20,
-      }).addTo(map.current);
-
-    L.marker([47.21725000, -1.55336000], {
-      icon: L.icon({
-        iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png',
-        iconSize: [28, 75],
-        iconAnchor: [22, 94],
-        popupAnchor: [-3, -76],
-      }),
-    })
-      .addTo(map.current)
-      .bindPopup('I am an example marker.');
-
-    }
-  }, [theme]);
-
-  return <div id="OBDMap" className="absolute top-0 left-0 z-0 w-full h-full"></div>;
+        <Card className="absolute z-1000 right-0 top-0 h-min m-5">
+            <CardContent className="">
+                <Routing />
+            </CardContent>
+        </Card>
+      </MapContainer>
+    </div>
+  );
 }

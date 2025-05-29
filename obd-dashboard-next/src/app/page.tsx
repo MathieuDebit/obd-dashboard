@@ -1,11 +1,9 @@
 'use client';
 
-import dynamic from 'next/dynamic'
 import useOBD from "@/hooks/useOBD";
 import GPSCarData from "@/components/GPSCarData";
 import { ChartConfig, ChartData } from "@/types/chart";
-
-const Map = dynamic(() => import('@/components/Map'), { ssr: false })
+import Map from '@/components/Map';
 
 
 const chartConfig = {
@@ -31,7 +29,7 @@ export default function Home() {
     <div  >
       <Map />
 
-      <div className="absolute w-full h-full p-10 pointer-events-none">
+      <div className="absolute w-full h-full top-0 left-0 m-5 pointer-events-none">
         <div className="w-100 pointer-events-auto">
           <GPSCarData chartData={chartData} chartConfig={chartConfig} />
         </div>

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "leaflet/dist/leaflet.css";
+@import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 @import "./chadcnui.css";
+@import "./leaflet.css";
 
 @custom-variant dark (&:is(.dark *));
