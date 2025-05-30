@@ -86,6 +86,22 @@ export default function Settings() {
                                 </SelectContent>
                             </Select>
                         </CardContent>
+
+                        <Separator />
+
+                        <CardContent className="flex justify-between">
+                            <div>Color</div>
+                            <Select defaultValue="red">
+                                <SelectTrigger className="w-30">
+                                    <SelectValue placeholder="" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="red">Red</SelectItem>
+                                    <SelectItem value="green">Green</SelectItem>
+                                    <SelectItem value="blue">Blue</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </CardContent>
                     </Card>
                 </TabsContent>
                 
