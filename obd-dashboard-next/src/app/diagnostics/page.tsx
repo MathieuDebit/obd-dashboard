@@ -1,165 +1,92 @@
 'use client';
 
-import { useRef, useMemo, useEffect, useState } from 'react'
-import { Canvas, useFrame, useLoader } from '@react-three/fiber'
-import { OrbitControls, Environment } from '@react-three/drei'
-import { GLTFLoader } from 'three-stdlib'
-import { DRACOLoader } from 'three-stdlib'
-import {
-  ACESFilmicToneMapping,
-  Color,
-  Mesh,
-  MeshBasicMaterial,
-  MeshPhysicalMaterial,
-  MeshStandardMaterial,
-  MultiplyBlending,
-  PlaneGeometry,
-  TextureLoader,
-  Group,
-  GridHelper,
-} from 'three'
-import Colorjs from 'colorjs.io';
+import { Card, CardContent } from "@/ui/card";
+import CarScene from "./CarScene";
+import { useState } from "react";
+import { cn } from "@/utils/classNames";
+import { ArrowRight, Car, TriangleAlert } from "lucide-react";
 
-interface CarProps {
-  carBodyColor: string
-  carDetailsColor: string
-  carGlassColor: string
-}
-
-function Car({ carBodyColor, carDetailsColor, carGlassColor }: CarProps) {
-  const carRef = useRef<Group>(null!)
-
-  const gltf = useLoader(GLTFLoader, '/models/gltf/ferrari.glb', loader => {
-    const draco = new DRACOLoader()
-    draco.setDecoderPath('/jsm/libs/draco/gltf/')
-    loader.setDRACOLoader(draco)
-  })
-
-  const shadowTexture = useLoader(TextureLoader, '/models/gltf/ferrari_ao.png')
-
-  const [sceneClone, wheelMeshes] = useMemo(() => {
-    const scene = gltf.scene.clone(true) as Group
-
-    const bodyMat = new MeshPhysicalMaterial({
-      color: new Color(carBodyColor),
-      metalness: 1,
-      roughness: 0.5,
-      clearcoat: 1,
-      clearcoatRoughness: 0.03,
-    })
-    const detailsMat = new MeshStandardMaterial({
-      color: new Color(carDetailsColor),
-      metalness: 1,
-      roughness: 0.5,
-    })
-    const glassMat = new MeshPhysicalMaterial({
-      color: new Color(carGlassColor),
-      metalness: 0.25,
-      roughness: 0,
-      transmission: 1,
-    })
-
-    const body = scene.getObjectByName('body') as Mesh | null
-    if (body) body.material = bodyMat
-
-    ;['rim_fl','rim_fr','rim_rr','rim_rl','trim'].forEach(name => {
-      const mesh = scene.getObjectByName(name) as Mesh | null
-      if (mesh) mesh.material = detailsMat
-    })
-
-    const glass = scene.getObjectByName('glass') as Mesh | null
-    if (glass) glass.material = glassMat
-
-    const wheels = ['wheel_fl','wheel_fr','wheel_rl','wheel_rr']
-      .map(name => scene.getObjectByName(name) as Mesh | null)
-      .filter((m): m is Mesh => m !== null)
-
-    const plane = new Mesh(
-      new PlaneGeometry(0.655 * 4, 1.3 * 4),
-      new MeshBasicMaterial({
-        map: shadowTexture,
-        blending: MultiplyBlending,
-        toneMapped: false,
-        transparent: true,
-      })
-    )
-    plane.rotation.x = -Math.PI / 2
-    plane.renderOrder = 2
-    scene.add(plane)
-
-    return [scene, wheels] as const
-  }, [gltf, carBodyColor, carDetailsColor, carGlassColor, shadowTexture])
-
-  useFrame(state => {
-    const t = -state.clock.getElapsedTime()
-    wheelMeshes.forEach(wheel => {
-      wheel.rotation.x = t * Math.PI * 0.7 * 0
-    })
-  })
-
-  return <primitive ref={carRef} object={sceneClone} />
-}
-
-interface AnimatedGridProps {
-  size: number;
-  divisions: number;
-  colorCenterLine: string;
-  colorGrid: string;
-}
-
-function AnimatedGrid({ size, divisions, colorCenterLine, colorGrid }: AnimatedGridProps) {
-  const gridRef = useRef<GridHelper>(null!)
-
-  useFrame(state => {
-    const t = -state.clock.getElapsedTime()
-
-    if (gridRef.current) {
-      gridRef.current.position.z = -(t % 1) * 0
-    }
-  })
-
-  return <gridHelper ref={gridRef} args={[size, divisions, colorCenterLine, colorGrid]} />
-}
-
-const colorToHex = (color: string) => new Colorjs(color).to('srgb').toString({ format: 'hex' });
 
 export default function Page() {
-  const [background, setBackground] = useState('');
-  const [foreground, setForeground] = useState('');
+  const [opened, setOpened] = useState(false);
+  const [currentErrorCard, setCurrentErrorCard] = useState<string | null>(null);
 
-  useEffect(() => {
-    const styles = getComputedStyle(document.documentElement);
-    const bgColor = colorToHex(styles.getPropertyValue("--sidebar-ring"));
-    const fgColor = colorToHex(styles.getPropertyValue("--muted"));
+  const toogleOpen = () => {
+    setOpened((state) => !state);
+    setCurrentErrorCard(null);
+  }
 
-    setBackground(bgColor);
-    setForeground(fgColor);
-  }, []);
-
-  const carBodyColor = '#ff0000';
-  const carDetailsColor = '#ffffff';
-  const carGlassColor = '#ffffff';
+  const handleOpenErrorCard = (errorCode: string) => {
+    if (currentErrorCard === errorCode) {
+      setCurrentErrorCard(null);
+    } else {
+      setCurrentErrorCard(errorCode);
+    }
+  }
 
   return (
-    <Canvas
-      style={{ height: '100%', width: '100%', position: 'absolute', top: '0', left: '0' }}
-      camera={{ position: [4.25, 1.4, -4.5], fov: 40 }}
-      gl={{ antialias: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 0.85 }}
-    >
-      <color attach="background" args={[background]} />
-      <Environment files="/textures/equirectangular/venice_sunset_1k.hdr" />
-      <Car carBodyColor={carBodyColor} carDetailsColor={carDetailsColor} carGlassColor={carGlassColor} />
-      <OrbitControls
-        autoRotate
-        autoRotateSpeed={-2}
-        enableDamping
-        dampingFactor={0.05}
-        minDistance={3}
-        maxDistance={10}
-        minPolarAngle={Math.PI/6}  
-        maxPolarAngle={Math.PI/2}
-        target={[0, 0.5, 0]}
-      />
-    </Canvas>
+    <div>
+      <CarScene />
+
+      <Card className={cn(
+        "absolute top-5 right-5 size-20 transition-all duration-200 ease-in-out opacity-0 border-0",
+          opened && "w-2/5 h-2/3 opacity-100 border",
+      )}>
+        <CardContent className="pt-15 px-5">
+          <div className={cn(
+            currentErrorCard && "overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms, 100ms] delay-[500ms,500ms,500ms,0ms] h-0 opacity-0 m-0 p-0",
+            !currentErrorCard && "overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms, 500ms, 500ms,100ms] delay-[0ms,0ms,0ms,500ms] h-30 opacity-100 m-3"
+          )}>
+            <div className="text-lg font-bold">Nissan Skyline R34 GT-R</div>
+            <div className="text-sm">VIN : WP0ZZZ99ZTS39</div>
+            <div className="font-bold mt-8 mb-4">2 erreurs</div>
+          </div>
+          
+          <div className="">
+            <Card
+              className={cn(
+                !currentErrorCard && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms, 500ms, 500ms,100ms] delay-[0ms,0ms,0ms,500ms] opacity-100 max-h-100",
+                currentErrorCard && currentErrorCard !== 'P0170' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[500ms,500ms,500ms,0ms] opacity-0 h-0 p-0 m-0"
+              )}
+              onClick={() => handleOpenErrorCard('P0170')}
+            >
+              <CardContent className="flex items-center">
+                <div className="flex-1 mr-5">
+                  <div className="text-sm">Garniture de carburant (banque 1)</div>
+                  <div className="text-xs">Code défaut P0170</div>
+                </div>
+                <ArrowRight />
+              </CardContent>
+            </Card>
+
+            <Card
+              className={cn(
+                !currentErrorCard && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms, 500ms, 500ms,100ms] delay-[0ms,0ms,0ms,500ms] opacity-100 max-h-100",
+                currentErrorCard && currentErrorCard !== 'P0320' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[500ms,500ms,500ms,0ms] opacity-0 h-0 p-0 m-0"
+              )}
+              onClick={() => handleOpenErrorCard('P0320')}
+            >
+              <CardContent className="flex items-center">
+              <div className="flex-1 mr-5">
+                <div className="text-sm">Capteur de vilebrequin – panne du circuit</div>
+                <div className="text-xs">Code défaut P0320</div>
+              </div>
+              <ArrowRight />
+              </CardContent>
+            </Card>
+          </div>
+          
+        </CardContent>
+      </Card>
+
+      <div className="absolute top-9 right-9 size-12 flex justify-center items-center border-2 bg-primary-foreground rounded-lg" onClick={toogleOpen}>
+        <Car size={30} />
+        <div className="absolute top-0 left-0 -translate-2">
+          <span className="absolute inline-flex size-7 -translate-1 rounded-full bg-orange-400 opacity-100"></span>
+          <span className="absolute inline-flex size-7 -translate-1 rounded-full bg-orange-300 opacity-100"></span>
+          <TriangleAlert size={20} className="relative" />
+        </div>
+      </div>
+    </div>
   )
 }
