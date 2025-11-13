@@ -1,3 +1,3 @@
-#!/usr/bin/sh
+#!/usr/bin/env sh
 
-python3 server.py --only_supported --port ${1:-/dev/pts/5}
+obd-dashboard-server "$@"
