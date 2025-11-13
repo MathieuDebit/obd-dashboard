@@ -94,7 +94,7 @@ export default function CommandsPage() {
     return (
         <div className="absolute w-full h-full top-0 left-0 p-3">
             <div className="flex flex-col h-full gap-4">
-                <ScrollArea className="w-full">
+                <ScrollArea className="w-full h-1/2">
                     <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                         {pids.map(({ pid, name, value }) => {
                             const isActive = pid === currentTab;
