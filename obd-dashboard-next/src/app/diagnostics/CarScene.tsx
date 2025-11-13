@@ -124,7 +124,7 @@ export default function CarScene() {
   return (
     <Canvas
       style={{ height: '100%', width: '100%', position: 'absolute', top: '0', left: '0' }}
-      camera={{ position: [4.25, 1.4, -4.5], fov: 40 }}
+      camera={{ position: [4.25, 1.4, -8.5], fov: 40 }}
       gl={{ antialias: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 0.85 }}
     >
       <color attach="background" args={[background]} />
