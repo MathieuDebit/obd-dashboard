@@ -21,15 +21,14 @@ const CardDescription = memo(({ description }: { description: string }) => {
         )
     })
 
+CardDescription.displayName = "CardDescription";
+
 export default function CommandsPage() {
     const [currentTab, setCurrentTab] = useState<string | null>(null);
     const [chartData, setChartData] = useState(
         Array.from({ length:60 }, () => ({ time: 0, value: 0 }))
     );
     const { pids, error, isLoading } = useOBD();
-
-    if (error) return <div>failed to load</div>
-    if (isLoading) return <div>loading...</div>
 
     const updateChartData = useCallback((value: number) => {
         setChartData(prev => [
@@ -53,6 +52,14 @@ export default function CommandsPage() {
         setCurrentTab(tab);
         setChartData(Array.from({ length:60 }, () => ({ time: 0, value: 0 })));
     };
+
+    if (error) {
+        return <div>failed to load</div>
+    }
+
+    if (isLoading) {
+        return <div>loading...</div>
+    }
 
     return (
         <div className="absolute w-full h-full top-0 left-0 p-3">
