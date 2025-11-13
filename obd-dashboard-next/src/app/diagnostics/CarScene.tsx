@@ -78,6 +78,7 @@ function Car({ carBodyColor, carDetailsColor, carGlassColor }: CarProps) {
       new MeshBasicMaterial({
         map: shadowTexture,
         blending: MultiplyBlending,
+        premultipliedAlpha: true,
         toneMapped: false,
         transparent: true,
       })
