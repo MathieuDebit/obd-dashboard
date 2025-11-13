@@ -9,18 +9,7 @@ export const metadata: Metadata = {
   description: "Web dashboard for OBD data",
 };
 
-const themeInitScript = `
-(function() {
-  try {
-    var stored = localStorage.getItem('${THEME_STORAGE_KEY}');
-    if (!stored) return;
-    var theme = stored === 'dark' ? 'dark' : 'light';
-    var root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
-  } catch (_) {}
-})();
-`;
+const themeInitScript = `(()=>{try{var stored=localStorage.getItem('${THEME_STORAGE_KEY}');if(!stored)return;var theme=stored==='dark'?'dark':'light';var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(theme);}catch(_){}})();`;
 
 const ThemeInitScript = () => (
   <script
