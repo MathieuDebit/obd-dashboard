@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 """
-OBD-II WebSocket server for streaming OBD-II PIDs over WebSocket JSON.
+OBD-II telemetry bridge that polls an ECU and streams JSON payloads via WebSocket.
 
-Exemple usage:
-python obd_web_stream.py --port /dev/ttyUSB0 --only_supported --interval 1 --ws_port 8765
+This module provides a small CLI (`python server.py ...`) that:
+
+  * Opens a serial (or socket) connection to an ELM327-compatible interface.
+  * Periodically queries Mode 01 PIDs using python-OBD.
+  * Caches the latest sample and serves it to any WebSocket client (the dashboard UI).
+
+Typical usage::
+
+    python server.py --port /dev/ttyUSB0 --only_supported --interval 1 --ws_port 8765
 """
 
 from __future__ import annotations
@@ -24,12 +31,35 @@ if TYPE_CHECKING:
 
 
 def build_command_list(connection: "OBD", only_supported: bool) -> List["OBDCommand"]:
+    """
+    Resolve the list of Mode 01 commands to poll from the ECU.
+
+    Args:
+        connection: Active python-OBD connection.
+        only_supported: Restrict to ECU-supported commands when True.
+
+    Returns:
+        A list of `OBDCommand` objects ready to be queried.
+    """
+
     if only_supported:
         return list(connection.supported_commands)
     available: Iterable["OBDCommand"] = cast(Iterable["OBDCommand"], getattr(obd, "commands", []))
     return [c for c in available if getattr(c, "mode", None) == 1 and getattr(c, "pid", None) is not None]
 
+
 async def _push_latest(queue: asyncio.Queue, payload: Dict[str, Any]) -> None:
+    """
+    Keep only the most recent payload in the single-slot queue.
+
+    Args:
+        queue: The asyncio queue shared with websocket consumers.
+        payload: The newest telemetry snapshot.
+
+    Returns:
+        None. Discards the previous payload if the queue is full.
+    """
+
     if queue.full():
         with contextlib.suppress(asyncio.QueueEmpty):
             queue.get_nowait()
@@ -37,6 +67,19 @@ async def _push_latest(queue: asyncio.Queue, payload: Dict[str, Any]) -> None:
 
 
 async def poll_obd(connection: "OBD", cmds: List["OBDCommand"], interval: float, queue: asyncio.Queue) -> None:
+    """
+    Continuously query the ECU and enqueue JSON-ready payloads.
+
+    Args:
+        connection: Active python-OBD session.
+        cmds: Commands to execute during each polling cycle.
+        interval: Seconds between sampling rounds (>= 0.2).
+        queue: Sink for latest samples to share with websocket handlers.
+
+    Returns:
+        None. Runs until the surrounding task is cancelled.
+    """
+
     while True:
         pids: Dict[str, Any] = {}
         for cmd in cmds:
@@ -58,7 +101,19 @@ async def poll_obd(connection: "OBD", cmds: List["OBDCommand"], interval: float,
         await _push_latest(queue, payload)
         await asyncio.sleep(interval)
 
+
 async def consumer_handler(websocket: "WebSocketServerProtocol", queue: asyncio.Queue) -> None:
+    """
+    Relay queue entries to a connected WebSocket client until they disconnect.
+
+    Args:
+        websocket: Client connection created by `websockets.serve`.
+        queue: Source of the latest payload produced by `poll_obd`.
+
+    Returns:
+        None. Completes when the websocket is closed.
+    """
+
     try:
         while True:
             data = await queue.get()
@@ -67,6 +122,16 @@ async def consumer_handler(websocket: "WebSocketServerProtocol", queue: asyncio.
         pass
 
 async def main_async(args: argparse.Namespace) -> None:
+    """
+    Wire together the ECU connection, polling task, and WebSocket server.
+
+    Args:
+        args: Parsed CLI arguments produced by `argparse`.
+
+    Returns:
+        None. Blocks until the websocket server finishes or the process exits.
+    """
+
     print("Connecting to ECU...", file=sys.stderr)
     connection = obd.OBD(portstr=args.port, baudrate=args.baudrate, fast=False, timeout=2)
     if not connection.is_connected():
@@ -82,6 +147,7 @@ async def main_async(args: argparse.Namespace) -> None:
         poll_task = asyncio.create_task(poll_obd(connection, cmds, args.interval, queue))
 
         async def handler(websocket, *_unused):
+            # `websockets.serve` provides `(websocket, path)` but the path is unused here.
             await consumer_handler(websocket, queue)
 
         serve_kwargs = {"host": "0.0.0.0", "port": args.ws_port}
@@ -99,7 +165,14 @@ async def main_async(args: argparse.Namespace) -> None:
             connection.close()
 
 def main():
-    parser = argparse.ArgumentParser(description="Stream all OBD-II PIDs over WebSocket JSON for JS frontend")
+    """
+    Parse CLI arguments, clamp defaults, and run the asyncio event loop.
+
+    Returns:
+        None. Hands control to the asyncio runner.
+    """
+
+    parser = argparse.ArgumentParser(description="Stream Mode 01 OBD-II PIDs over WebSocket JSON")
     parser.add_argument("--port", default="/dev/ttyUSB0", help="Serial port or socket, e.g. /dev/ttyUSB0 or socket://localhost:35000")
     parser.add_argument("--baudrate", type=int, default=38400, help="Serial baud rate (default 38400)")
     parser.add_argument("--interval", type=float, default=1.0, help="Polling interval seconds (min 0.2, default 1.0)")
