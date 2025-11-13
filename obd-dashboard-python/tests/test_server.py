@@ -1,15 +1,19 @@
+from __future__ import annotations
+
 import asyncio
 import contextlib
+import importlib
 import sys
 import types
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, cast
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SRC_PATH = PROJECT_ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
-import pytest
+import pytest  # noqa: E402
 
 
 def _install_test_stubs() -> None:
@@ -29,8 +33,8 @@ def _install_test_stubs() -> None:
             def query(self, _cmd):
                 raise NotImplementedError
 
-        fake_obd.OBD = _DummyOBD
-        fake_obd.commands = []
+        setattr(fake_obd, "OBD", _DummyOBD)
+        setattr(fake_obd, "commands", types.SimpleNamespace())
         sys.modules["obd"] = fake_obd
 
     if "websockets" not in sys.modules:
@@ -39,18 +43,31 @@ def _install_test_stubs() -> None:
         class _ConnectionClosed(Exception):
             pass
 
-        fake_ws.exceptions = types.SimpleNamespace(ConnectionClosed=_ConnectionClosed)
+        setattr(fake_ws, "exceptions", types.SimpleNamespace(ConnectionClosed=_ConnectionClosed))
 
         async def _unreachable(*_args, **_kwargs):
             raise RuntimeError("websockets.serve should not run in unit tests")
 
-        fake_ws.serve = _unreachable
+        setattr(fake_ws, "serve", _unreachable)
         sys.modules["websockets"] = fake_ws
+
+
+class _FakeAsyncStream:
+    def __init__(self, lines: list[str]):
+        self._lines: list[bytes] = [line.encode() for line in lines]
+
+    async def readline(self) -> bytes:
+        if not self._lines:
+            return b""
+        return self._lines.pop(0)
 
 
 _install_test_stubs()
 
-from obd_dashboard_server import server  # noqa: E402
+if TYPE_CHECKING:
+    server = cast(Any, None)
+else:
+    server = cast(Any, importlib.import_module("obd_dashboard_server.server"))
 
 
 class DummyCommand:
@@ -75,13 +92,13 @@ def test_build_command_list_only_supported():
 
 
 def test_build_command_list_filters_obd_commands(monkeypatch):
-    fake_commands = [
-        DummyCommand("A", mode=1, pid=0x00),
-        DummyCommand("B", mode=9, pid=0x01),
-        DummyCommand("C", mode=1, pid=None),
-        DummyCommand("D", mode=1, pid=0x02),
-    ]
-    monkeypatch.setattr(server.obd, "commands", fake_commands, raising=False)
+    class FakeCommands:
+        A = DummyCommand("A", mode=1, pid=0x00)
+        B = DummyCommand("B", mode=9, pid=0x01)
+        C = DummyCommand("C", mode=1, pid=None)
+        D = DummyCommand("D", mode=1, pid=0x02)
+
+    monkeypatch.setattr(server.obd, "commands", FakeCommands, raising=False)
     conn = DummyConnection([])
 
     result = server.build_command_list(conn, only_supported=False)
@@ -136,10 +153,7 @@ def test_extract_emulator_port():
 
 @pytest.mark.asyncio
 async def test_wait_for_emulator_port_parses_stream():
-    reader = asyncio.StreamReader()
-    reader.feed_data(b"Booting emulator...\n")
-    reader.feed_data(b"Connected to /dev/pts/8\n")
-    reader.feed_eof()
+    reader = _FakeAsyncStream(["Booting emulator...\n", "Connected to /dev/pts/8\n"])
 
     port = await server._wait_for_emulator_port(reader, detection_timeout=1)
 
