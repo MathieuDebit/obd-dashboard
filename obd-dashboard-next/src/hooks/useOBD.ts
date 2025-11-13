@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import useSWRSubscription, { SWRSubscriptionOptions } from "swr/subscription";
 import { OBD_COMMANDS } from "@/utils/formatOBD";
 import { Command, Commands, OBDServerResponse } from "@/types/commands";
+import { isCorePid, toPidKey } from "@/constants/pids";
+import { getPidCopy } from "@/utils/i18n";
+import { useLanguage } from "@/app/LanguageContext";
 
 type ConnectionStatus = "idle" | "connecting" | "ready" | "error";
 
@@ -26,6 +29,7 @@ export default function useOBD() {
   const [parseError, setParseError] = useState<Error | null>(null);
   const [lastValidResponse, setLastValidResponse] =
     useState<OBDServerResponse>(DEFAULT_RESPONSE);
+  const { locale } = useLanguage();
 
   const subscriber = useCallback(
     (key: string, { next }: SWRSubscriptionOptions<string, Error>) => {
@@ -41,6 +45,21 @@ export default function useOBD() {
       };
 
       const handleMessage = (event: MessageEvent<string>) => {
+        try {
+          const parsed = JSON.parse(event.data) as Partial<OBDServerResponse>;
+          const normalized = normalizeResponse(parsed);
+          setLastValidResponse(normalized);
+          setParseError(null);
+        } catch (err) {
+          const error =
+            err instanceof Error
+              ? err
+              : new Error("[useOBD] Failed to parse OBD payload");
+          if (process.env.NODE_ENV !== "test") {
+            console.warn(error);
+          }
+          setParseError(error);
+        }
         next(null, event.data);
       };
 
@@ -73,49 +92,51 @@ export default function useOBD() {
     []
   );
 
-  const { data } = useSWRSubscription(WS_URL, subscriber);
-
-  useEffect(() => {
-    if (!data) return;
-
-    try {
-      const parsed = JSON.parse(data) as Partial<OBDServerResponse>;
-      const normalized = normalizeResponse(parsed);
-      setLastValidResponse(normalized);
-      setParseError(null);
-    } catch (err) {
-      const error =
-        err instanceof Error
-          ? err
-          : new Error("[useOBD] Failed to parse OBD payload");
-      setParseError(error);
-      console.warn(error);
-    }
-  }, [data]);
+  useSWRSubscription(WS_URL, subscriber);
 
   const commands: Commands = useMemo(() => {
     const entries = Object.entries(lastValidResponse.pids ?? {});
 
     const formatted = entries
       .map<Command | null>(([pid, rawValue]) => {
-        const command = OBD_COMMANDS[pid];
-        if (!command) {
+        const commandMeta = OBD_COMMANDS[pid];
+        if (!commandMeta) {
           return null;
         }
+
+        const copy = getPidCopy(pid, locale);
 
         return {
           pid,
           rawValue,
-          name: command.name,
-          value: command.formatValue(rawValue),
-          description: command.description,
+          name: copy.name,
+          value: commandMeta.formatValue(rawValue),
+          description: copy.description,
         };
       })
       .filter((command): command is Command => command !== null)
       .sort((a, b) => a.name.localeCompare(b.name));
 
     return formatted;
-  }, [lastValidResponse]);
+  }, [lastValidResponse, locale]);
+
+  const pidMap = useMemo(() => {
+    const map = new Map<string, Command>();
+    commands.forEach((command) => {
+      map.set(toPidKey(command.pid), command);
+    });
+    return map;
+  }, [commands]);
+
+  const corePids = useMemo(
+    () => commands.filter((command) => isCorePid(command.pid)),
+    [commands]
+  );
+
+  const otherPids = useMemo(
+    () => commands.filter((command) => !isCorePid(command.pid)),
+    [commands]
+  );
 
   const combinedError = connectionError ?? parseError;
   const isLoading = status !== "ready";
@@ -123,6 +144,9 @@ export default function useOBD() {
   return {
     timestamp: lastValidResponse.timestamp,
     pids: commands,
+    corePids,
+    otherPids,
+    pidMap,
     error: combinedError,
     status,
     isLoading,

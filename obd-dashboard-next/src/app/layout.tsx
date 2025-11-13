@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import AppShell from "@/app/html";
 import "@/ui/css/globals.css";
 import { ThemeProvider, THEME_STORAGE_KEY } from "@/app/ThemeContext";
+import { LanguageProvider } from "@/app/LanguageContext";
 import { geistMono, geistSans } from "@/ui/fonts";
 
 export const metadata: Metadata = {
@@ -30,7 +31,9 @@ export default function RootLayout({
       >
         <ThemeInitScript />
         <ThemeProvider>
-          <AppShell>{children}</AppShell>
+          <LanguageProvider>
+            <AppShell>{children}</AppShell>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -2,6 +2,9 @@
 
 import { useContext } from "react";
 import { Theme, ThemeContext } from "@/app/ThemeContext";
+import { useLanguage } from "@/app/LanguageContext";
+import type { Locale } from "@/utils/i18n";
+import { translateUi } from "@/utils/i18n";
 import { Card, CardContent } from "@/ui/card";
 import {
   Select,
@@ -18,6 +21,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
 
 export default function Settings() {
     const { theme, changeTheme } = useContext(ThemeContext);
+    const { locale, changeLocale } = useLanguage();
+    const t = (key: string, fallback: string) => translateUi(key, locale, fallback);
 
     const onThemeChange = (newTheme: Theme) => {
         changeTheme(newTheme);
@@ -27,22 +32,22 @@ export default function Settings() {
         <div>
             <Tabs defaultValue="general" className="w-full">
                 <TabsList className="w-full h-13 mb-5">
-                    <TabsTrigger value="general">General</TabsTrigger>
-                    <TabsTrigger value="vehicule">Vehicule</TabsTrigger>
-                    <TabsTrigger value="obd">OBD</TabsTrigger>
-                    <TabsTrigger value="about">About</TabsTrigger>
+                    <TabsTrigger value="general">{t("settings.tab.general", "General")}</TabsTrigger>
+                    <TabsTrigger value="vehicle">{t("settings.tab.vehicle", "Vehicle")}</TabsTrigger>
+                    <TabsTrigger value="obd">{t("settings.tab.obd", "OBD")}</TabsTrigger>
+                    <TabsTrigger value="about">{t("settings.tab.about", "About")}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="general">
                     <Card className="mb-5">
                         <CardContent className="flex justify-between">
-                            <div>Language</div>
-                            <Select defaultValue="français">
+                            <div>{t("settings.language.label", "Language")}</div>
+                            <Select value={locale} onValueChange={(value) => changeLocale(value as Locale)}>
                                 <SelectTrigger className="w-30">
                                     <SelectValue placeholder="" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="français">Français</SelectItem>
-                                    <SelectItem value="english">English</SelectItem>
+                                    <SelectItem value="fr">Français</SelectItem>
+                                    <SelectItem value="en">English</SelectItem>
                                 </SelectContent>
                             </Select>
                         </CardContent>
@@ -50,38 +55,38 @@ export default function Settings() {
                         <Separator />
 
                         <CardContent className="flex justify-between">
-                            <div>Theme</div>
+                            <div>{t("settings.theme.label", "Theme")}</div>
                             <Select onValueChange={onThemeChange} defaultValue={theme}>
                                 <SelectTrigger className="w-30">
-                                    <SelectValue placeholder="Select theme" />
+                                    <SelectValue placeholder={t("settings.theme.placeholder", "Select theme")} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="light">Light</SelectItem>
-                                    <SelectItem value="dark">Dark</SelectItem>
+                                    <SelectItem value="light">{t("settings.theme.light", "Light")}</SelectItem>
+                                    <SelectItem value="dark">{t("settings.theme.dark", "Dark")}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </CardContent>
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="vehicule">
+                <TabsContent value="vehicle">
                     <Card className="">
                         <CardContent className="flex justify-between">
-                            <div>Model</div>
+                            <div>{t("settings.vehicle.model", "Model")}</div>
                             <Select defaultValue="nissan-skyliner34gtr">
                                 <SelectTrigger className="w-55">
                                     <SelectValue placeholder="" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Nissan</SelectLabel>
-                                        <SelectItem value="nissan-skyliner34gtr">Nissan Skyline R34 GT-R</SelectItem>
-                                        <SelectItem value="nissan-200sx">Nissan 200SX</SelectItem>
+                                        <SelectLabel>{t("settings.vehicle.brand.nissan", "Nissan")}</SelectLabel>
+                                        <SelectItem value="nissan-skyliner34gtr">{t("settings.vehicle.model.nissan_r34", "Nissan Skyline R34 GT-R")}</SelectItem>
+                                        <SelectItem value="nissan-200sx">{t("settings.vehicle.model.nissan_200sx", "Nissan 200SX")}</SelectItem>
                                     </SelectGroup>
                                     <SelectGroup>
-                                        <SelectLabel>Toyota</SelectLabel>
-                                        <SelectItem value="toyota-supramk4">Toyota Supra MK4</SelectItem>
-                                        <SelectItem value="toyota-ae86">Toyota AE86</SelectItem>
+                                        <SelectLabel>{t("settings.vehicle.brand.toyota", "Toyota")}</SelectLabel>
+                                        <SelectItem value="toyota-supramk4">{t("settings.vehicle.model.toyota_supra", "Toyota Supra MK4")}</SelectItem>
+                                        <SelectItem value="toyota-ae86">{t("settings.vehicle.model.toyota_ae86", "Toyota AE86")}</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -90,15 +95,15 @@ export default function Settings() {
                         <Separator />
 
                         <CardContent className="flex justify-between">
-                            <div>Color</div>
+                            <div>{t("settings.vehicle.color", "Color")}</div>
                             <Select defaultValue="red">
                                 <SelectTrigger className="w-30">
                                     <SelectValue placeholder="" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="red">Red</SelectItem>
-                                    <SelectItem value="green">Green</SelectItem>
-                                    <SelectItem value="blue">Blue</SelectItem>
+                                    <SelectItem value="red">{t("settings.vehicle.color.red", "Red")}</SelectItem>
+                                    <SelectItem value="green">{t("settings.vehicle.color.green", "Green")}</SelectItem>
+                                    <SelectItem value="blue">{t("settings.vehicle.color.blue", "Blue")}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </CardContent>
@@ -108,8 +113,8 @@ export default function Settings() {
                 <TabsContent value='obd'>
                     <Card className="">
                         <CardContent className="flex justify-between">
-                            <div>Restart server</div>
-                            <Button>Restart</Button>
+                            <div>{t("settings.obd.restart.label", "Restart server")}</div>
+                            <Button>{t("settings.obd.restart.button", "Restart")}</Button>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -117,15 +122,15 @@ export default function Settings() {
                 <TabsContent value='about'>
                     <Card className="">
                         <CardContent className="flex justify-between">
-                            <div>App version</div>
+                            <div>{t("settings.about.version", "App version")}</div>
                             <div className="mr-1">0.1.0</div>
                         </CardContent>
 
                         <Separator />
 
                         <CardContent className="flex justify-between">
-                            <div>Check for updates</div>
-                            <Button>Check</Button>
+                            <div>{t("settings.about.check", "Check for updates")}</div>
+                            <Button>{t("settings.about.check.button", "Check")}</Button>
                         </CardContent>
                     </Card>
                 </TabsContent>

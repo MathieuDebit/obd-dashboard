@@ -46,6 +46,21 @@ DEFAULT_WS_PORT = 8765
 DEFAULT_EMULATOR_TIMEOUT = 5.0
 _EMULATOR_PORT_PATTERN = re.compile(r"(/dev/pts/\d+)")
 _DEFAULT_BAUD_PROBE_ORDER: tuple[Optional[int], ...] = (None, 115200, 38400, 9600)
+_EMULATOR_DEFAULT_PIDS = {
+    "RPM",
+    "SPEED",
+    "THROTTLE_POS",
+    "ENGINE_LOAD",
+    "INTAKE_PRESSURE",
+    "SHORT_FUEL_TRIM_1",
+    "LONG_TERM_FUEL_TRIM_1",
+    "O2_B1S1",
+    "O2_B1S2",
+    "TIMING_ADVANCE",
+    "COOLANT_TEMP",
+    "INTAKE_TEMP",
+    "PIDS_A",
+}
 
 
 def _mode1_commands() -> List["OBDCommand"]:
@@ -365,6 +380,26 @@ async def main_async(args: argparse.Namespace) -> None:
             supported_names = ", ".join(sorted(cmd.name for cmd in supported_cmds)) if supported_cmds else "none"
             log(f"Supported Mode 01 PIDs: {supported_names}")
             cmds = build_command_list(connection, args.only_supported)
+            if args.emulator and not args.emulator_all_pids:
+                preferred = {name.upper() for name in _EMULATOR_DEFAULT_PIDS}
+                curated_cmds = [
+                    cmd
+                    for cmd in cmds
+                    if getattr(cmd, "name", "").upper() in preferred
+                ]
+                if curated_cmds:
+                    omitted = len(cmds) - len(curated_cmds)
+                    cmds = curated_cmds
+                    log(
+                        f"Emulator mode: limiting to {len(cmds)} curated PIDs "
+                        f"(omitted {omitted}; pass --emulator-all-pids to disable)."
+                    )
+                else:
+                    log(
+                        "Emulator mode: curated PID list not available in this environment; "
+                        "falling back to full PID set.",
+                        level="warning",
+                    )
             log(f"Streaming {len(cmds)} PIDs every {args.interval}s on ws://{args.host}:{args.ws_port}")
 
             queue = asyncio.Queue(maxsize=1)
@@ -444,6 +479,11 @@ def main():
         "--emulator",
         action="store_true",
         help="Launch the built-in ELM emulator and auto-connect the server to it.",
+    )
+    parser.add_argument(
+        "--emulator-all-pids",
+        action="store_true",
+        help="When using --emulator, stream every available PID instead of the curated real-car list.",
     )
     parser.add_argument(
         "--emulator-scenario",
