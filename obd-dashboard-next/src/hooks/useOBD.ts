@@ -5,6 +5,7 @@ import { Command, Commands, OBDServerResponse } from "@/types/commands";
 import { isCorePid, toPidKey } from "@/constants/pids";
 import { getPidCopy } from "@/utils/i18n";
 import { useLanguage } from "@/app/LanguageContext";
+import { recordPidSamples } from "@/store/pidHistory";
 
 type ConnectionStatus = "idle" | "connecting" | "ready" | "error";
 
@@ -49,6 +50,7 @@ export default function useOBD() {
           const parsed = JSON.parse(event.data) as Partial<OBDServerResponse>;
           const normalized = normalizeResponse(parsed);
           setLastValidResponse(normalized);
+          recordPidSamples(normalized);
           setParseError(null);
         } catch (err) {
           const error =

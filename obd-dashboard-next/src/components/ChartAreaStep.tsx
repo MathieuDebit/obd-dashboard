@@ -51,6 +51,16 @@ interface ChartAreaStepProps {
 
 const defaultSeries: ChartSeriesConfig[] = [{ dataKey: "value", name: "Value" }]
 
+const formatTickLabel = (value: number) => {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return ""
+  }
+  const date = new Date(value)
+  const minutes = date.getMinutes().toString().padStart(2, "0")
+  const seconds = date.getSeconds().toString().padStart(2, "0")
+  return `${minutes}:${seconds}`
+}
+
 export function ChartAreaStep({
   title,
   description,
@@ -80,7 +90,7 @@ export function ChartAreaStep({
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => (value > 0 ? `${value}s` : "")}
+              tickFormatter={formatTickLabel}
             />
             <YAxis
               tickLine={false}
@@ -139,17 +149,19 @@ function ChartTooltip({
   }
 
   const resolvedLabel =
-    typeof label === "number" || typeof label === "string" ? label : "--"
-  const labelSuffix = typeof resolvedLabel === "number" ? "s" : ""
+    typeof label === "number"
+      ? label
+      : typeof label === "string"
+      ? Number(label)
+      : NaN
+  const formattedLabel = Number.isNaN(resolvedLabel)
+    ? "--"
+    : formatTickLabel(resolvedLabel)
 
   return (
     <div className="rounded-md border border-border bg-background px-3 py-2 text-xs shadow-xl">
       <p className="font-medium text-muted-foreground">
-        Time:{" "}
-        <span className="text-foreground">
-          {resolvedLabel}
-          {labelSuffix}
-        </span>
+        Time: <span className="text-foreground">{formattedLabel}</span>
       </p>
       <div className="mt-2 space-y-1">
         {payload.map((item) => (

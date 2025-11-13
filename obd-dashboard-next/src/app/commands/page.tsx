@@ -1,72 +1,20 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useOBD from "@/hooks/useOBD";
 import { ScrollArea } from "@/ui/scroll-area";
 import { Markdown } from "@/components/Markdown";
 import { ChartAreaStep } from "@/components/ChartAreaStep";
 import { Info, X } from "lucide-react";
-
-
-const SERIES_LENGTH = 60;
-const createEmptySeries = () =>
-    Array.from({ length: SERIES_LENGTH }, () => ({ time: 0, value: 0 }));
+import { usePidHistory } from "@/store/pidHistory";
 
 export default function CommandsPage() {
     const [currentTab, setCurrentTab] = useState<string | null>(null);
-    const [chartHistory, setChartHistory] = useState<Record<string, { time: number, value: number }[]>>({});
     const [infoPid, setInfoPid] = useState<string | null>(null);
     const { pids, error, isLoading } = useOBD();
-
-    const updateChartData = useCallback((pid: string, value: number) => {
-        setChartHistory(prev => {
-            const prevSeries = prev[pid] ?? createEmptySeries();
-            const nextSeries = [
-                ...prevSeries.slice(1),
-                { time: prevSeries[prevSeries.length - 1].time + 1, value }
-            ];
-
-            return {
-                ...prev,
-                [pid]: nextSeries,
-            };
-        });
-    }, []);
-
-    const currentPidRawValue = useMemo<number | null>(() => {
-        if (!currentTab) return null;
-        const currentPid = pids.find(p => p.pid === currentTab);
-        return currentPid ? Number(currentPid.rawValue) : null;
-    }, [pids, currentTab]);
+    const pidHistory = usePidHistory(currentTab ?? null);
 
     useEffect(() => {
-        if (!currentTab) return;
-        if (!(currentTab in chartHistory)) {
-            setChartHistory(prev => ({
-                ...prev,
-                [currentTab]: createEmptySeries(),
-            }));
-        }
-    }, [chartHistory, currentTab]);
-
-    useEffect(() => {
-        if (currentPidRawValue === null || !currentTab) return;
-        updateChartData(currentTab, currentPidRawValue);
-    }, [currentPidRawValue, currentTab, updateChartData]);
-
-    useEffect(() => {
-        setChartHistory(prev => {
-            let changed = false;
-            const next = { ...prev };
-            pids.forEach(({ pid }) => {
-                if (!next[pid]) {
-                    next[pid] = createEmptySeries();
-                    changed = true;
-                }
-            });
-            return changed ? next : prev;
-        });
-
         if (!currentTab && pids.length > 0) {
             setCurrentTab(pids[0].pid);
         }
@@ -74,11 +22,21 @@ export default function CommandsPage() {
 
     const onPidSelect = (pid: string) => {
         setCurrentTab(pid);
-        setChartHistory(prev => ({
-            ...prev,
-            [pid]: prev[pid] ?? createEmptySeries(),
-        }));
     };
+
+    const selectedPid = pids.find(({ pid }) => pid === currentTab);
+    const chartData = useMemo(() => {
+        if (!selectedPid || pidHistory.length === 0) {
+            return [];
+        }
+
+        return pidHistory.map(({ timestamp, value }) => ({
+            time: timestamp,
+            value,
+        }));
+    }, [selectedPid?.pid, pidHistory]);
+
+    const infoPidData = infoPid ? pids.find(({ pid }) => pid === infoPid) ?? null : null;
 
     if (error) {
         return <div>failed to load</div>
@@ -87,9 +45,6 @@ export default function CommandsPage() {
     if (isLoading) {
         return <div>loading...</div>
     }
-
-    const selectedPid = pids.find(({ pid }) => pid === currentTab);
-    const infoPidData = infoPid ? pids.find(({ pid }) => pid === infoPid) ?? null : null;
 
     return (
         <div className="absolute w-full h-full top-0 left-0 p-3">
@@ -130,7 +85,7 @@ export default function CommandsPage() {
                             <ChartAreaStep
                                 title={selectedPid.name}
                                 description={selectedPid.pid}
-                                chartData={chartHistory[selectedPid.pid] ?? createEmptySeries()}
+                                chartData={chartData}
                             />
                         </div>
                     ) : (
