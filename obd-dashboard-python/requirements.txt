@@ -1,3 +1,0 @@
-obd @ git+https://github.com/brendan-w/python-OBD.git
-websockets>=10.0
-ELM327-emulator
