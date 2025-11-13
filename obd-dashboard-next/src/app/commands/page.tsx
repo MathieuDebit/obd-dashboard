@@ -1,31 +1,14 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, memo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import useOBD from "@/hooks/useOBD";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
-import { Card, CardContent } from "@/ui/card";
 import { ScrollArea } from "@/ui/scroll-area";
-import { Markdown } from '@/components/Markdown'
 import { ChartAreaStep } from "@/components/ChartAreaStep";
 
 
 const SERIES_LENGTH = 60;
 const createEmptySeries = () =>
     Array.from({ length: SERIES_LENGTH }, () => ({ time: 0, value: 0 }));
-
-const CardDescription = memo(({ description }: { description: string }) => {
-        return (
-            <Card className="mt-3">
-                <CardContent>
-                    <ScrollArea>
-                        <Markdown content={description} />
-                    </ScrollArea>
-                </CardContent>
-            </Card>
-        )
-    })
-
-CardDescription.displayName = "CardDescription";
 
 export default function CommandsPage() {
     const [currentTab, setCurrentTab] = useState<string | null>(null);
@@ -86,11 +69,11 @@ export default function CommandsPage() {
         }
     }, [pids, currentTab]);
 
-    const onTabChange = (tab: string) => {
-        setCurrentTab(tab);
+    const onPidSelect = (pid: string) => {
+        setCurrentTab(pid);
         setChartHistory(prev => ({
             ...prev,
-            [tab]: prev[tab] ?? createEmptySeries(),
+            [pid]: prev[pid] ?? createEmptySeries(),
         }));
     };
 
@@ -102,28 +85,47 @@ export default function CommandsPage() {
         return <div>loading...</div>
     }
 
+    const selectedPid = pids.find(({ pid }) => pid === currentTab);
+
     return (
         <div className="absolute w-full h-full top-0 left-0 p-3">
-            <Tabs defaultValue="" className="flex flex-row overflow-hidden h-full" onValueChange={onTabChange}>
-                <TabsList className="w-1/3 flex flex-col h-full">
-                    <ScrollArea className="w-full h-full">
-                        { pids.map(({ pid, name, value }) =>
-                            <TabsTrigger key={`trigger-${pid}`} className="w-full flex justify-between" value={pid}>
-                                <span>{ name }</span>
-                                <span>{ value }</span>
-                            </TabsTrigger>
-                        )}
-                    </ScrollArea>
-                </TabsList>
+            <div className="flex flex-col h-full gap-4">
+                <ScrollArea className="w-full h-1/2">
+                    <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        {pids.map(({ pid, name, value }) => {
+                            const isActive = pid === currentTab;
+                            return (
+                                <button
+                                    key={`pid-button-${pid}`}
+                                    type="button"
+                                    aria-pressed={isActive}
+                                    onClick={() => onPidSelect(pid)}
+                                    className={`rounded-md border p-3 text-left transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                                        isActive ? "border-primary bg-primary/5" : "border-muted"
+                                    }`}
+                                >
+                                    <div className="text-xs uppercase tracking-wide text-muted-foreground">{name}</div>
+                                    <div className="text-2xl font-semibold">{value ?? "--"}</div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </ScrollArea>
 
-                { pids.map(({ pid, name, description }) =>
-                    <TabsContent key={`content-${pid}`} className="flex flex-col" value={pid}>
-                        <ChartAreaStep title={name} description={pid} chartData={chartHistory[pid] ?? createEmptySeries()} />
-
-                        <CardDescription description={description} />
-                    </TabsContent>
-                )}
-            </Tabs>
+                <div className="flex-1 overflow-hidden">
+                    {selectedPid ? (
+                        <ChartAreaStep
+                            title={selectedPid.name}
+                            description={selectedPid.pid}
+                            chartData={chartHistory[selectedPid.pid] ?? createEmptySeries()}
+                        />
+                    ) : (
+                        <div className="h-full flex items-center justify-center text-muted-foreground">
+                            Select a PID to display its chart.
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 }
