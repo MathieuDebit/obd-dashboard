@@ -1,0 +1,99 @@
+import asyncio
+import contextlib
+
+import pytest
+
+from obd_dashboard_server import server
+
+
+class DummyCommand:
+    def __init__(self, name: str, mode: int = 1, pid: int | None = 0):
+        self.name = name
+        self.mode = mode
+        self.pid = pid
+
+
+class DummyConnection:
+    def __init__(self, supported_commands: list[DummyCommand]):
+        self.supported_commands = supported_commands
+
+
+def test_build_command_list_only_supported():
+    commands = [DummyCommand("A"), DummyCommand("B")]
+    conn = DummyConnection(commands)
+
+    result = server.build_command_list(conn, only_supported=True)
+
+    assert result == commands
+
+
+def test_build_command_list_filters_obd_commands(monkeypatch):
+    fake_commands = [
+        DummyCommand("A", mode=1, pid=0x00),
+        DummyCommand("B", mode=9, pid=0x01),
+        DummyCommand("C", mode=1, pid=None),
+        DummyCommand("D", mode=1, pid=0x02),
+    ]
+    monkeypatch.setattr(server.obd, "commands", fake_commands, raising=False)
+    conn = DummyConnection([])
+
+    result = server.build_command_list(conn, only_supported=False)
+
+    assert [cmd.name for cmd in result] == ["A", "D"]
+
+
+@pytest.mark.asyncio
+async def test_push_latest_keeps_newest_entry():
+    queue: asyncio.Queue[dict[str, int]] = asyncio.Queue(maxsize=1)
+    await queue.put({"value": 1})
+
+    await server._push_latest(queue, {"value": 2})
+
+    assert queue.qsize() == 1
+    payload = await queue.get()
+    assert payload["value"] == 2
+
+
+@pytest.mark.asyncio
+async def test_consumer_handler_sends_queue_payload(monkeypatch):
+    queue: asyncio.Queue[dict[str, str]] = asyncio.Queue()
+
+    class FakeWebSocket:
+        def __init__(self):
+            self.remote_address = "test-client"
+            self.messages: list[str] = []
+
+        async def send(self, data: str) -> None:
+            self.messages.append(data)
+
+    ws = FakeWebSocket()
+    task = asyncio.create_task(server.consumer_handler(ws, queue))
+
+    await queue.put({"hello": "world"})
+    await asyncio.sleep(0)  # let handler run
+
+    assert len(ws.messages) == 1
+
+    task.cancel()
+    with contextlib.suppress(asyncio.CancelledError):
+        await task
+
+
+def test_extract_emulator_port():
+    line = "Ready! Connect via /dev/pts/7 now."
+
+    port = server._extract_emulator_port(line)
+
+    assert port == "/dev/pts/7"
+
+
+@pytest.mark.asyncio
+async def test_wait_for_emulator_port_parses_stream():
+    reader = asyncio.StreamReader()
+    reader.feed_data(b"Booting emulator...\n")
+    reader.feed_data(b"Connected to /dev/pts/8\n")
+    reader.feed_eof()
+
+    port = await server._wait_for_emulator_port(reader, detection_timeout=1)
+
+    assert port == "/dev/pts/8"
