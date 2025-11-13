@@ -13,7 +13,22 @@ pip install -e .[dev]
 deactivate
 ```
 
-The editable install exposes a console command named `obd-dashboard-server`.
+### Configure the Linux serial interface
+
+ELM327 USB adapters are exposed as `/dev/ttyUSB*` and belong to the `dialout` group on most distributions. Add yourself to that group and refresh the rules so the server can open the port without `sudo`:
+
+```bash
+sudo usermod -aG dialout "$USER"
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+# start a new shell (e.g. log out/back in) so the group change is applied
+```
+
+After re-login, plug the adapter and confirm the device is accessible:
+
+```bash
+ls -l /dev/ttyUSB*
+```
 
 ## Quick start
 
@@ -55,5 +70,4 @@ The suite covers the queue helper, command selection logic, WebSocket consumer, 
 
 - `OSError: [Errno 98] ... address already in use` – another server is bound to the port. Stop the existing process or choose a different `--ws-port`.
 - Emulator fails to announce a pseudo-terminal – rerun with `--emulator` and a higher `--emulator-timeout`, or run `python -m elm -s car` manually to inspect its output.
-<!-- TODO: for the serial interface issue, add in the installation section the necessary instructions to configure the elm interface, including commands to configure linux system and user group. Remove instructions for windows and macos. Keep troubleshooting part to give info for possible issues. -->
-- `/dev/ttyUSB0 not found` – list available serial interfaces (`ls /dev/ttyUSB*` on Linux, `ls /dev/tty.*` on macOS) and point `--port` to the correct one. On Linux you may need to add your user to the `dialout` group to access USB serial devices.
+- `/dev/ttyUSB0 not found` – list available serial interfaces (`ls /dev/ttyUSB*`) and point `--port` to the correct one. Ensure your user is in the `dialout` group so you have permission to access the adapter.

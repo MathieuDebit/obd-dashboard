@@ -24,7 +24,7 @@ import json
 from datetime import datetime
 import re
 import sys
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 import obd
 import websockets
 
@@ -45,6 +45,47 @@ DEFAULT_PORT = "/dev/ttyUSB0"
 DEFAULT_WS_PORT = 8765
 DEFAULT_EMULATOR_TIMEOUT = 5.0
 _EMULATOR_PORT_PATTERN = re.compile(r"(/dev/pts/\d+)")
+
+
+def _mode1_commands() -> List["OBDCommand"]:
+    """
+    Collect Mode 01 PIDs exposed by python-OBD.
+
+    Returns:
+        List of `OBDCommand` objects that represent Mode 01 requests with a PID.
+    """
+
+    commands_obj = getattr(obd, "commands", None)
+    if commands_obj is None:
+        return []
+    discovered: List["OBDCommand"] = []
+    for attr in dir(commands_obj):
+        if attr.startswith("_"):
+            continue
+        cmd = getattr(commands_obj, attr, None)
+        if cmd is None:
+            continue
+        mode = getattr(cmd, "mode", None)
+        pid = getattr(cmd, "pid", None)
+        if mode == 1 and pid is not None:
+            discovered.append(cmd)
+    return discovered
+
+
+def _mode1_supported_commands(connection: "OBD") -> List["OBDCommand"]:
+    """
+    Filter the ECU-reported supported commands to only Mode 01 PIDs.
+    """
+
+    try:
+        supported = list(connection.supported_commands)
+    except Exception:
+        return []
+    return [
+        cmd
+        for cmd in supported
+        if getattr(cmd, "mode", None) == 1 and getattr(cmd, "pid", None) is not None
+    ]
 
 
 def log(message: str, level: str = "info") -> None:
@@ -80,8 +121,7 @@ def build_command_list(connection: "OBD", only_supported: bool) -> List["OBDComm
     if only_supported:
         commands = list(connection.supported_commands)
     else:
-        available: Iterable["OBDCommand"] = cast(Iterable["OBDCommand"], getattr(obd, "commands", []))
-        commands = [c for c in available if getattr(c, "mode", None) == 1 and getattr(c, "pid", None) is not None]
+        commands = _mode1_commands()
     log(f"Prepared {len(commands)} commands (only_supported={only_supported}).")
     return commands
 
@@ -204,20 +244,39 @@ async def poll_obd(connection: "OBD", cmds: List["OBDCommand"], interval: float,
         None. Runs until the surrounding task is cancelled.
     """
 
+    reported_response_pids = False
+    responded_names: set[str] = set()
+    reported_failures: set[str] = set()
+
     while True:
         pids: Dict[str, Any] = {}
         for cmd in cmds:
+            cmd_name = getattr(cmd, "name", str(cmd))
+            if cmd_name in reported_failures:
+                continue
             try:
                 rsp = connection.query(cmd)
             except Exception as exc:
-                log(f"Failed to query {getattr(cmd, 'name', cmd)}: {exc}", level="warning")
+                if cmd_name not in reported_failures:
+                    log(f"{cmd_name} not supported or query failed: {exc}", level="warning")
+                    reported_failures.add(cmd_name)
                 continue
             if rsp is None or rsp.is_null():
+                if cmd_name not in reported_failures:
+                    log(f"{cmd_name} not supported by ECU (null response)", level="warning")
+                    reported_failures.add(cmd_name)
                 continue
             value = rsp.value
             if value is None:
+                if cmd_name not in reported_failures:
+                    log(f"{cmd_name} responded with empty value", level="warning")
+                    reported_failures.add(cmd_name)
                 continue
-            pids[cmd.name] = getattr(value, "magnitude", value)
+            pids[cmd_name] = getattr(value, "magnitude", value)
+            responded_names.add(cmd_name)
+        if not reported_response_pids and responded_names:
+            log(f"Responding Mode 01 PIDs: {', '.join(sorted(responded_names))}")
+            reported_response_pids = True
         payload = {
             "timestamp": datetime.now().isoformat(timespec="seconds"),
             "pids": pids,
@@ -278,6 +337,9 @@ async def main_async(args: argparse.Namespace) -> None:
 
         poll_task = None
         try:
+            supported_cmds = _mode1_supported_commands(connection)
+            supported_names = ", ".join(sorted(cmd.name for cmd in supported_cmds)) if supported_cmds else "none"
+            log(f"Supported Mode 01 PIDs: {supported_names}")
             cmds = build_command_list(connection, args.only_supported)
             log(f"Streaming {len(cmds)} PIDs every {args.interval}s on ws://{args.host}:{args.ws_port}")
 
