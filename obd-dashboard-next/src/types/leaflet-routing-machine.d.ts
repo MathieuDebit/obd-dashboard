@@ -1,7 +1,7 @@
 import * as L from 'leaflet';
 
 declare module 'leaflet-routing-machine' {
-  const routing: any;
+  const routing: Record<string, unknown>;
   export = routing;
 }
 
@@ -16,7 +16,11 @@ declare module 'leaflet' {
       showAlternatives?: boolean;
       collapsible?: boolean;
       routeWhileDragging?: boolean;
-      createMarker?: (i: number, wp: any, n: number) => L.Marker;
+      createMarker?: (i: number, wp: Waypoint, n: number) => L.Marker;
+    }
+    interface Waypoint {
+      latLng: L.LatLngExpression;
+      name?: string;
     }
   }
   namespace Routing {
