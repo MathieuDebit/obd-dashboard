@@ -3,41 +3,58 @@ import L from "leaflet";
 import "leaflet-routing-machine";
 import { useMap } from "react-leaflet";
 
-L.Marker.prototype.options.icon = L.icon({
+const DEFAULT_ICON = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
 });
+
+L.Marker.prototype.options.icon = DEFAULT_ICON;
 
 export default function Routing() {
   const map = useMap();
   const containerRef = useRef<HTMLDivElement>(null);
+  const controlRef = useRef<L.Routing.Control | null>(null);
 
   useEffect(() => {
-    if (!map && !containerRef.current) return;
-    if (containerRef.current?.childElementCount && containerRef.current.childElementCount > 0) return;
+    const container = containerRef.current;
+    if (!map || !container) {
+      return;
+    }
+
+    if (controlRef.current) {
+      return;
+    }
 
     const routingControl = L.Routing.control({
-        waypoints: [L.latLng(47.218372, -1.553621), L.latLng(48.856613, 2.352222)],
-        routeWhileDragging: false,
+      waypoints: [
+        L.latLng(47.218372, -1.553621),
+        L.latLng(48.856613, 2.352222),
+      ],
+      routeWhileDragging: false,
+      addWaypoints: false,
+      draggableWaypoints: false,
+      lineOptions: {
+        styles: [
+          { color: "#3a80e9", weight: 5 },
+          { color: "#ffffff", weight: 2, opacity: 0.7 },
+        ],
+      },
+    });
 
-        lineOptions: {
-          styles: [
-            { color: "#3a80e9", weight: 5 },
-            { color: "#ffffff", weight: 2, opacity: 0.7 }
-          ]
-        },
-      });
+    controlRef.current = routingControl;
 
-      const ctrlEl = routingControl.onAdd(map);
-      containerRef.current?.appendChild(ctrlEl);
+    const controlElement = routingControl.onAdd(map);
+    container.appendChild(controlElement);
 
-      return () => {
-        if (containerRef.current?.contains(ctrlEl)) {
-          containerRef.current.removeChild(ctrlEl);
-        }
-      };
+    return () => {
+      controlRef.current = null;
+      routingControl.off();
+      routingControl.remove();
+
+      if (container.contains(controlElement)) {
+        container.removeChild(controlElement);
+      }
+    };
   }, [map]);
 
-  return (
-    <div ref={containerRef} />
-  );
+  return <div ref={containerRef} />;
 }

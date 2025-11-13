@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
-import HTML from "@/app/html";
-import '@/ui/css/globals.css';
-import { ThemeProvider } from "@/app/ThemeContext";
-
+import AppShell from "@/app/html";
+import "@/ui/css/globals.css";
+import { ThemeProvider, THEME_STORAGE_KEY } from "@/app/ThemeContext";
+import { geistMono, geistSans } from "@/ui/fonts";
 
 export const metadata: Metadata = {
   title: "OBD Dashboard Web",
   description: "Web dashboard for OBD data",
 };
+
+const themeInitScript = `(()=>{try{var stored=localStorage.getItem('${THEME_STORAGE_KEY}');if(!stored)return;var theme=stored==='dark'?'dark':'light';var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(theme);}catch(_){}})();`;
+
+const ThemeInitScript = () => (
+  <script
+    dangerouslySetInnerHTML={{ __html: themeInitScript }}
+    suppressHydrationWarning
+  />
+);
 
 export default function RootLayout({
   children,
@@ -15,10 +24,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ThemeProvider>
-      <HTML>
-        {children}
-      </HTML>
-    </ThemeProvider>
+    <html lang="en" className="light">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-muted`}
+      >
+        <ThemeInitScript />
+        <ThemeProvider>
+          <AppShell>{children}</AppShell>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

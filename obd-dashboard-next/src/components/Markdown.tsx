@@ -2,7 +2,7 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import rehypeRaw from 'rehype-raw'
+import rehypeSanitize from 'rehype-sanitize'
 
 interface MarkdownProps {
   content: string
@@ -12,10 +12,16 @@ export function Markdown({ content }: MarkdownProps) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
-      rehypePlugins={[rehypeRaw]}
+      rehypePlugins={[rehypeSanitize]}
       components={{
-        p: ({ node, ...props }) => <p className="mb-2" {...props} />,
-        li: ({ node, ...props }) => <li className="list-disc ml-6" {...props} />,
+        p: ({ node, ...props }) => {
+          void node;
+          return <p className="mb-2" {...props} />;
+        },
+        li: ({ node, ...props }) => {
+          void node;
+          return <li className="ml-6 list-disc" {...props} />;
+        },
       }}
     >
       {content}

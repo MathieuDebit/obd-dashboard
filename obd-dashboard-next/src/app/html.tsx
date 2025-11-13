@@ -1,32 +1,17 @@
 'use client';
 
-import { useContext, useEffect } from "react";
-import { geistSans, geistMono } from "@/ui/fonts";
+import { PropsWithChildren } from "react";
 import { ScrollArea } from "@/ui/scroll-area";
 import Nav from "@/ui/nav";
-import { ThemeContext } from "@/app/ThemeContext";
 
-
-export default function HTML({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const { theme } = useContext(ThemeContext);
-
+export default function AppShell({ children }: PropsWithChildren) {
   return (
-    <html lang="en" className={theme}>
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased bg-muted`}
-        >
-            <div className="flex flex-row h-screen p-3">
-            <Nav />
+    <div className="flex h-screen flex-row p-3">
+      <Nav />
 
-            <ScrollArea className="bg-background flex grow rounded-xl border p-4 overflow-hidden">
-                {children}
-            </ScrollArea>
-            </div>
-        </body>
-    </html>
+      <ScrollArea className="bg-background flex grow overflow-hidden rounded-xl border p-4">
+        {children}
+      </ScrollArea>
+    </div>
   );
 }

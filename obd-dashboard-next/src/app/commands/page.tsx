@@ -9,6 +9,10 @@ import { Markdown } from '@/components/Markdown'
 import { ChartAreaStep } from "@/components/ChartAreaStep";
 
 
+const SERIES_LENGTH = 60;
+const createEmptySeries = () =>
+    Array.from({ length: SERIES_LENGTH }, () => ({ time: 0, value: 0 }));
+
 const CardDescription = memo(({ description }: { description: string }) => {
         return (
             <Card className="mt-3">
@@ -21,21 +25,26 @@ const CardDescription = memo(({ description }: { description: string }) => {
         )
     })
 
+CardDescription.displayName = "CardDescription";
+
 export default function CommandsPage() {
     const [currentTab, setCurrentTab] = useState<string | null>(null);
-    const [chartData, setChartData] = useState(
-        Array.from({ length:60 }, () => ({ time: 0, value: 0 }))
-    );
+    const [chartHistory, setChartHistory] = useState<Record<string, { time: number, value: number }[]>>({});
     const { pids, error, isLoading } = useOBD();
 
-    if (error) return <div>failed to load</div>
-    if (isLoading) return <div>loading...</div>
+    const updateChartData = useCallback((pid: string, value: number) => {
+        setChartHistory(prev => {
+            const prevSeries = prev[pid] ?? createEmptySeries();
+            const nextSeries = [
+                ...prevSeries.slice(1),
+                { time: prevSeries[prevSeries.length - 1].time + 1, value }
+            ];
 
-    const updateChartData = useCallback((value: number) => {
-        setChartData(prev => [
-        ...prev.slice(1),
-        { time: prev[prev.length - 1].time + 1, value }
-        ]);
+            return {
+                ...prev,
+                [pid]: nextSeries,
+            };
+        });
     }, []);
 
     const currentPidRawValue = useMemo<number | null>(() => {
@@ -45,14 +54,53 @@ export default function CommandsPage() {
     }, [pids, currentTab]);
 
     useEffect(() => {
-        if (currentPidRawValue === null) return;
-        updateChartData(currentPidRawValue);
-    }, [currentPidRawValue, updateChartData]);
+        if (!currentTab) return;
+        if (!(currentTab in chartHistory)) {
+            setChartHistory(prev => ({
+                ...prev,
+                [currentTab]: createEmptySeries(),
+            }));
+        }
+    }, [chartHistory, currentTab]);
+
+    useEffect(() => {
+        if (currentPidRawValue === null || !currentTab) return;
+        updateChartData(currentTab, currentPidRawValue);
+    }, [currentPidRawValue, currentTab, updateChartData]);
+
+    useEffect(() => {
+        setChartHistory(prev => {
+            let changed = false;
+            const next = { ...prev };
+            pids.forEach(({ pid }) => {
+                if (!next[pid]) {
+                    next[pid] = createEmptySeries();
+                    changed = true;
+                }
+            });
+            return changed ? next : prev;
+        });
+
+        if (!currentTab && pids.length > 0) {
+            setCurrentTab(pids[0].pid);
+        }
+    }, [pids, currentTab]);
 
     const onTabChange = (tab: string) => {
         setCurrentTab(tab);
-        setChartData(Array.from({ length:60 }, () => ({ time: 0, value: 0 })));
+        setChartHistory(prev => ({
+            ...prev,
+            [tab]: prev[tab] ?? createEmptySeries(),
+        }));
     };
+
+    if (error) {
+        return <div>failed to load</div>
+    }
+
+    if (isLoading) {
+        return <div>loading...</div>
+    }
 
     return (
         <div className="absolute w-full h-full top-0 left-0 p-3">
@@ -70,7 +118,7 @@ export default function CommandsPage() {
 
                 { pids.map(({ pid, name, description }) =>
                     <TabsContent key={`content-${pid}`} className="flex flex-col" value={pid}>
-                        <ChartAreaStep title={name} description={pid} chartData={chartData} />
+                        <ChartAreaStep title={name} description={pid} chartData={chartHistory[pid] ?? createEmptySeries()} />
 
                         <CardDescription description={description} />
                     </TabsContent>
