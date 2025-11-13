@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang='en'>
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>__TITLE__</title>
+  <link rel="stylesheet" href="assets/css/report.css">
+  <script src="assets/js/plotly-3.1.0.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <header>
+    <h2 style='margin:4px 0'>__TITLE__</h2>
+    <div class='muted'>Source: __SOURCE__</div>
+  </header>
+  <div class='wrap'>
+    <nav>
+      <input type='search' id='navFilter' placeholder='Filter PIDs...' />
+      <ul id='navList'>__SIDEBAR__</ul>
+    </nav>
+    <main>
+      <h3>Summary</h3>
+      __SUMMARY__
+      <div class='panel'>
+        <h3 style='margin-top:0'>Correlation heatmap</h3>
+        __HEAT__
+      </div>
+      <div class='toolbar'><label class='toggle'>
+        <input type='checkbox' id='linkZoom' checked> Link zoom across per‑PID charts</label>
+      </div>
+      <h3>Per‑PID charts</h3>
+      <div class='charts' id='charts'>__BODY__</div>
+    </main>
+  </div>
+  <script>window.OBD_DATA = __DATA__;</script>
+  <script src="assets/js/report.js"></script>
+</body>
+</html>

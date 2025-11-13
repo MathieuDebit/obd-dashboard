@@ -1,0 +1,35 @@
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "obdtools"
+version = "0.1.0"
+description = "OBD CSV logger and offline HTML visualizer with compare & correlation"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "Dev"}]
+dependencies = [
+  "pandas>=2.0",
+  "plotly>=5.18"
+]
+
+[project.scripts]
+obdtools = "obdtools.cli:main"
+
+[project.optional-dependencies]
+logger = ["obd>=0.7", "odfpy>=1.4.1"]
+test = ["pytest>=7.4", "pytest-cov>=4.1"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+obdtools = ["templates/*.html", "assets/css/*.css", "assets/js/*.js"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["obdtools*"]
+
