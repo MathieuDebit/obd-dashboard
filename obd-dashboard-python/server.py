@@ -6,23 +6,31 @@ Exemple usage:
 python obd_web_stream.py --port /dev/ttyUSB0 --only_supported --interval 1 --ws_port 8765
 """
 
+from __future__ import annotations
+
 import argparse
 import asyncio
 import json
 from datetime import datetime
 import sys
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, cast
 import obd
 import websockets
 
+if TYPE_CHECKING:
+    from obd import OBD, OBDCommand
+    from websockets.server import WebSocketServerProtocol
 
-def build_command_list(connection, only_supported):
+
+def build_command_list(connection: "OBD", only_supported: bool) -> List["OBDCommand"]:
     if only_supported:
-        return connection.supported_commands
-    return [c for c in obd.commands if getattr(c, "mode", None) == 1 and getattr(c, "pid", None) is not None]
+        return list(connection.supported_commands)
+    available: Iterable["OBDCommand"] = cast(Iterable["OBDCommand"], getattr(obd, "commands", []))
+    return [c for c in available if getattr(c, "mode", None) == 1 and getattr(c, "pid", None) is not None]
 
-async def poll_obd(connection, cmds, interval, queue):
+async def poll_obd(connection: "OBD", cmds: List["OBDCommand"], interval: float, queue: asyncio.Queue) -> None:
     while True:
-        pids = {}
+        pids: Dict[str, Any] = {}
         for cmd in cmds:
             rsp = connection.query(cmd)
             if not rsp.is_null():
@@ -39,7 +47,7 @@ async def poll_obd(connection, cmds, interval, queue):
         await queue.put(payload)
         await asyncio.sleep(interval)
 
-async def consumer_handler(websocket, queue):
+async def consumer_handler(websocket: "WebSocketServerProtocol", queue: asyncio.Queue) -> None:
     try:
         while True:
             data = await queue.get()
@@ -47,7 +55,7 @@ async def consumer_handler(websocket, queue):
     except websockets.exceptions.ConnectionClosed:
         pass
 
-async def main_async(args):
+async def main_async(args: argparse.Namespace) -> None:
     print("Connecting to ECU…", file=sys.stderr)
     connection = obd.OBD(portstr=args.port, baudrate=args.baudrate, fast=False, timeout=2)
     if not connection.is_connected():
