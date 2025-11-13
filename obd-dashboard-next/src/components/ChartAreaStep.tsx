@@ -1,7 +1,16 @@
 "use client"
 
-import { Activity } from "lucide-react"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  TooltipProps,
+  XAxis,
+  YAxis,
+} from "recharts"
 import {
   Card,
   CardContent,
@@ -9,78 +18,164 @@ import {
   CardHeader,
   CardTitle,
 } from "@/ui/card"
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/ui/chart"
-import { ChartConfig } from "@/types/chart"
 
+type AreaType = "basis" | "bump" | "linear" | "monotone" | "natural" | "step"
 
-const chartConfig = {
-  value: {
-    label: "Value",
-    color: "var(--card-foreground)",
-    icon: Activity,
-  },
-} satisfies ChartConfig
+const COLOR_PALETTE = [
+  "#6366f1",
+  "#14b8a6",
+  "#f97316",
+  "#ef4444",
+  "#22d3ee",
+  "#84cc16",
+]
 
-interface ChartAreaStepProps {
-  title?: string;
-  description?: string;
-  chartData: { time: number, value: number }[];
+export interface ChartSeriesConfig {
+  dataKey: string
+  name?: string
+  color?: string
+  type?: AreaType
+  strokeWidth?: number
+  fillOpacity?: number
+  stackId?: string
 }
 
-export function ChartAreaStep({ title, description, chartData }: ChartAreaStepProps) {
+interface ChartAreaStepProps {
+  title?: string
+  description?: string
+  chartData: { time: number; [key: string]: number }[]
+  series?: ChartSeriesConfig[]
+  yLabel?: string
+  valueFormatter?: (value: number) => string
+}
+
+const defaultSeries: ChartSeriesConfig[] = [{ dataKey: "value", name: "Value" }]
+
+export function ChartAreaStep({
+  title,
+  description,
+  chartData,
+  series,
+  yLabel,
+  valueFormatter,
+}: ChartAreaStepProps) {
+  const seriesToRender =
+    series && series.length > 0 ? series : defaultSeries
+
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
-        {title && <CardTitle>{title}</CardTitle> }
-        { description &&
-          <CardDescription>
-            {description}
-          </CardDescription>
-        }
+        {title && <CardTitle>{title}</CardTitle>}
+        {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
+      <CardContent className="h-[340px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            accessibilityLayer
             data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
+            margin={{ top: 16, bottom: 8, left: 0, right: 16 }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid strokeDasharray="4 4" stroke="hsl(var(--muted-foreground) / 0.2)" />
             <XAxis
               dataKey="time"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value > 0 ? value : ''}
+              tickFormatter={(value) => (value > 0 ? `${value}s` : "")}
             />
             <YAxis
-              dataKey="value"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+              label={
+                yLabel
+                  ? {
+                      value: yLabel,
+                      angle: -90,
+                      position: "insideLeft",
+                      offset: -5,
+                      fill: "hsl(var(--muted-foreground))",
+                    }
+                  : undefined
+              }
             />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Area
-              dataKey="value"
-              type="step"
-              fill="var(--color-value)"
-              fillOpacity={0.4}
-              stroke="var(--color-value)"
-              isAnimationActive={false}
-            />
+            <Tooltip content={<ChartTooltip valueFormatter={valueFormatter} />} />
+            {seriesToRender.length > 1 && (
+              <Legend wrapperStyle={{ paddingTop: 8 }} />
+            )}
+            {seriesToRender.map((serie, index) => {
+              const stroke = serie.color || COLOR_PALETTE[index % COLOR_PALETTE.length]
+              return (
+                <Area
+                  key={serie.dataKey}
+                  type={serie.type ?? "monotone"}
+                  dataKey={serie.dataKey}
+                  name={serie.name}
+                  stroke={stroke}
+                  strokeWidth={serie.strokeWidth ?? 2}
+                  fill={stroke}
+                  fillOpacity={serie.fillOpacity ?? 0.2}
+                  stackId={serie.stackId}
+                  isAnimationActive={false}
+                />
+              )
+            })}
           </AreaChart>
-        </ChartContainer>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
+  )
+}
+
+function ChartTooltip({
+  active,
+  payload,
+  label,
+  valueFormatter,
+}: TooltipProps<number, string> & {
+  valueFormatter?: (value: number) => string
+}) {
+  if (!active || !payload?.length) {
+    return null
+  }
+
+  const resolvedLabel =
+    typeof label === "number" || typeof label === "string" ? label : "--"
+  const labelSuffix = typeof resolvedLabel === "number" ? "s" : ""
+
+  return (
+    <div className="rounded-md border border-border bg-background px-3 py-2 text-xs shadow-xl">
+      <p className="font-medium text-muted-foreground">
+        Time:{" "}
+        <span className="text-foreground">
+          {resolvedLabel}
+          {labelSuffix}
+        </span>
+      </p>
+      <div className="mt-2 space-y-1">
+        {payload.map((item) => (
+          <div
+            key={item.dataKey}
+            className="flex items-center justify-between gap-6"
+          >
+            <span className="flex items-center gap-2 text-muted-foreground">
+              <span
+                className="inline-block h-2 w-2 rounded-sm"
+                style={{
+                  backgroundColor: item.color || "hsl(var(--primary))",
+                }}
+              />
+              {item.name ?? item.dataKey}
+            </span>
+            <span className="font-semibold text-foreground">
+              {typeof item.value === "number"
+                ? valueFormatter
+                  ? valueFormatter(item.value)
+                  : item.value.toFixed(2)
+                : item.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
