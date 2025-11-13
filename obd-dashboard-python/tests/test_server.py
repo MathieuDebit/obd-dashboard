@@ -1,9 +1,56 @@
 import asyncio
 import contextlib
+import sys
+import types
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_PATH = PROJECT_ROOT / "src"
+if str(SRC_PATH) not in sys.path:
+    sys.path.insert(0, str(SRC_PATH))
 
 import pytest
 
-from obd_dashboard_server import server
+
+def _install_test_stubs() -> None:
+    if "obd" not in sys.modules:
+        fake_obd = types.ModuleType("obd")
+
+        class _DummyOBD:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def is_connected(self) -> bool:
+                return True
+
+            def close(self) -> None:
+                pass
+
+            def query(self, _cmd):
+                raise NotImplementedError
+
+        fake_obd.OBD = _DummyOBD
+        fake_obd.commands = []
+        sys.modules["obd"] = fake_obd
+
+    if "websockets" not in sys.modules:
+        fake_ws = types.ModuleType("websockets")
+
+        class _ConnectionClosed(Exception):
+            pass
+
+        fake_ws.exceptions = types.SimpleNamespace(ConnectionClosed=_ConnectionClosed)
+
+        async def _unreachable(*_args, **_kwargs):
+            raise RuntimeError("websockets.serve should not run in unit tests")
+
+        fake_ws.serve = _unreachable
+        sys.modules["websockets"] = fake_ws
+
+
+_install_test_stubs()
+
+from obd_dashboard_server import server  # noqa: E402
 
 
 class DummyCommand:

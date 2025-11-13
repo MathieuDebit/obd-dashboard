@@ -298,6 +298,12 @@ async def main_async(args: argparse.Namespace) -> None:
                 )
                 async with websockets.serve(handler, **serve_kwargs):
                     await asyncio.Future()
+            except OSError as exc:
+                log(
+                    f"Failed to bind ws://{serve_kwargs['host']}:{serve_kwargs['port']}: {exc}",
+                    level="error",
+                )
+                sys.exit(1)
             finally:
                 if poll_task:
                     poll_task.cancel()
@@ -319,7 +325,13 @@ def main():
         None. Hands control to the asyncio runner.
     """
 
-    parser = argparse.ArgumentParser(description="Stream Mode 01 OBD-II PIDs over WebSocket JSON")
+    parser = argparse.ArgumentParser(
+        prog="obd-dashboard-server",
+        description="Stream Mode 01 OBD-II PIDs over WebSocket JSON",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        add_help=False,
+    )
+    parser.add_argument("-h", "--help", action="help", help="Show this help message and exit.")
     parser.add_argument(
         "--port",
         default=None,
