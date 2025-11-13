@@ -15,10 +15,6 @@ const TileLayer = dynamic(
   { ssr: false }
 );
 
-const Routing = dynamic(() => import("./Routing"), {
-  ssr: false,
-});
-
 
 export default function MapRoute() {
   const { theme } = useContext(ThemeContext);
@@ -36,12 +32,6 @@ export default function MapRoute() {
         <TileLayer
           url={`https://{s}.basemaps.cartocdn.com/${theme}_all/{z}/{x}/{y}{r}.png`}
         />
-
-        <Card className="absolute z-1000 right-0 top-0 h-min m-5">
-            <CardContent className="">
-                <Routing />
-            </CardContent>
-        </Card>
       </MapContainer>
     </div>
   );
