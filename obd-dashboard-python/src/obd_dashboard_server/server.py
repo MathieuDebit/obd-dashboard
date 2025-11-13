@@ -104,7 +104,6 @@ async def _push_latest(queue: asyncio.Queue[Dict[str, Any]], payload: Dict[str, 
     if queue.full():
         with contextlib.suppress(asyncio.QueueEmpty):
             queue.get_nowait()
-        log("Dropped stale sample from queue to keep the latest payload.", level="warning")
     await queue.put(payload)
 
 
@@ -297,13 +296,19 @@ async def main_async(args: argparse.Namespace) -> None:
                     level="success",
                 )
                 async with websockets.serve(handler, **serve_kwargs):
-                    await asyncio.Future()
+                    try:
+                        await asyncio.Future()
+                    except asyncio.CancelledError:
+                        log("Shutdown signal received; closing WebSocket server...", level="warning")
+                        raise
             except OSError as exc:
                 log(
                     f"Failed to bind ws://{serve_kwargs['host']}:{serve_kwargs['port']}: {exc}",
                     level="error",
                 )
                 sys.exit(1)
+            except asyncio.CancelledError:
+                pass
             finally:
                 if poll_task:
                     poll_task.cancel()
@@ -314,6 +319,8 @@ async def main_async(args: argparse.Namespace) -> None:
                 with contextlib.suppress(Exception):
                     connection.close()
             log("OBD connection closed and websocket server stopped.")
+    except asyncio.CancelledError:
+        log("Shutdown requested. Bye!", level="warning")
     finally:
         await _shutdown_emulator(emulator_proc, emulator_log_task)
 

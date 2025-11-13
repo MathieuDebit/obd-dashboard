@@ -55,4 +55,5 @@ The suite covers the queue helper, command selection logic, WebSocket consumer, 
 
 - `OSError: [Errno 98] ... address already in use` – another server is bound to the port. Stop the existing process or choose a different `--ws-port`.
 - Emulator fails to announce a pseudo-terminal – rerun with `--emulator` and a higher `--emulator-timeout`, or run `python -m elm -s car` manually to inspect its output.
+<!-- TODO: for the serial interface issue, add in the installation section the necessary instructions to configure the elm interface, including commands to configure linux system and user group. Remove instructions for windows and macos. Keep troubleshooting part to give info for possible issues. -->
 - `/dev/ttyUSB0 not found` – list available serial interfaces (`ls /dev/ttyUSB*` on Linux, `ls /dev/tty.*` on macOS) and point `--port` to the correct one. On Linux you may need to add your user to the `dialout` group to access USB serial devices.
