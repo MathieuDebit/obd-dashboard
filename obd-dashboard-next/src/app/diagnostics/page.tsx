@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/ui/card";
 import CarScene from "./CarScene";
-import { useState } from "react";
+import { KeyboardEvent, useState } from "react";
 import { cn } from "@/utils/classNames";
 import { ArrowRight, Car, TriangleAlert, X } from "lucide-react";
 import { Separator } from "@/ui/separator";
@@ -22,6 +22,13 @@ export default function Page() {
       setCurrentErrorCard(null);
     } else {
       setCurrentErrorCard(errorCode);
+    }
+  }
+
+  const handleKeyDown = (errorCode: string) => (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleOpenErrorCard(errorCode);
     }
   }
 
@@ -53,7 +60,11 @@ export default function Page() {
                 currentErrorCard && currentErrorCard === 'P0170' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[400ms,0ms,0ms,500ms] opacity-100 h-97",
                 currentErrorCard && currentErrorCard !== 'P0170' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[500ms,500ms,500ms,0ms] opacity-0 h-0 p-0 m-0"
               )}
+              role="button"
+              tabIndex={0}
+              aria-expanded={currentErrorCard === 'P0170'}
               onClick={() => handleOpenErrorCard('P0170')}
+              onKeyDown={handleKeyDown('P0170')}
             >
               <CardContent className="">
                 <div className="flex flex-center">
@@ -78,7 +89,11 @@ export default function Page() {
                 currentErrorCard && currentErrorCard === 'P0320' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[400ms,0ms,0ms,500ms] opacity-100 h-97",
                 currentErrorCard && currentErrorCard !== 'P0320' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[500ms,500ms,500ms,0ms] opacity-0 h-0 p-0 m-0"
               )}
+              role="button"
+              tabIndex={0}
+              aria-expanded={currentErrorCard === 'P0320'}
               onClick={() => handleOpenErrorCard('P0320')}
+              onKeyDown={handleKeyDown('P0320')}
             >
               <CardContent className="">
                 <div className="flex flex-center">
@@ -101,7 +116,19 @@ export default function Page() {
         </CardContent>
       </Card>
 
-      <div className="absolute top-9 right-9 size-12 flex justify-center items-center border-2 bg-primary-foreground rounded-lg" onClick={toogleOpen}>
+      <div
+        className="absolute top-9 right-9 size-12 flex justify-center items-center border-2 bg-primary-foreground rounded-lg"
+        role="button"
+        tabIndex={0}
+        aria-pressed={opened}
+        onClick={toogleOpen}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toogleOpen();
+          }
+        }}
+      >
         <Car size={30} />
         <div className="absolute top-0 left-0 -translate-2">
           <span className="absolute inline-flex size-7 -translate-1 rounded-full bg-orange-400 opacity-100"></span>

@@ -16,7 +16,6 @@ import {
   PlaneGeometry,
   TextureLoader,
   Group,
-  GridHelper,
 } from 'three'
 import Colorjs from 'colorjs.io';
 
@@ -91,49 +90,30 @@ function Car({ carBodyColor, carDetailsColor, carGlassColor }: CarProps) {
   }, [gltf, carBodyColor, carDetailsColor, carGlassColor, shadowTexture])
 
   useFrame(state => {
+    if (!ENABLE_WHEEL_ROTATION) {
+      return
+    }
     const t = -state.clock.getElapsedTime()
+    const rotationSpeed = Math.PI * WHEEL_ROTATION_SPEED
     wheelMeshes.forEach(wheel => {
-      wheel.rotation.x = t * Math.PI * 0.7 * 0
+      wheel.rotation.x = t * rotationSpeed
     })
   })
 
   return <primitive ref={carRef} object={sceneClone} />
 }
 
-interface AnimatedGridProps {
-  size: number;
-  divisions: number;
-  colorCenterLine: string;
-  colorGrid: string;
-}
-
-function AnimatedGrid({ size, divisions, colorCenterLine, colorGrid }: AnimatedGridProps) {
-  const gridRef = useRef<GridHelper>(null!)
-
-  useFrame(state => {
-    const t = -state.clock.getElapsedTime()
-
-    if (gridRef.current) {
-      gridRef.current.position.z = -(t % 1) * 0
-    }
-  })
-
-  return <gridHelper ref={gridRef} args={[size, divisions, colorCenterLine, colorGrid]} />
-}
-
 const colorToHex = (color: string) => new Colorjs(color).to('srgb').toString({ format: 'hex' });
+const ENABLE_WHEEL_ROTATION = false;
+const WHEEL_ROTATION_SPEED = 0.7;
 
 export default function CarScene() {
   const [background, setBackground] = useState('');
-  const [foreground, setForeground] = useState('');
 
   useEffect(() => {
     const styles = getComputedStyle(document.documentElement);
     const bgColor = colorToHex(styles.getPropertyValue("--sidebar-ring"));
-    const fgColor = colorToHex(styles.getPropertyValue("--muted"));
-
     setBackground(bgColor);
-    setForeground(fgColor);
   }, []);
 
   const carBodyColor = '#ff0000';

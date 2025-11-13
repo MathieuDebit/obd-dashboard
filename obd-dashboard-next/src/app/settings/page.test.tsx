@@ -1,12 +1,17 @@
 import { render, screen } from '@testing-library/react'
 import Settings from '@/app/settings/page'
+import { ThemeProvider } from '@/app/ThemeContext'
  
 describe('Settings', () => {
-  it('renders a heading', () => {
-    render(<Settings />)
+  it('renders the settings tabs and controls', () => {
+    render(
+      <ThemeProvider>
+        <Settings />
+      </ThemeProvider>
+    )
  
-    const heading = screen.getByRole('heading', { level: 1 })
- 
-    expect(heading).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /General/i })).toBeInTheDocument()
+    expect(screen.getByText('Language')).toBeInTheDocument()
+    expect(screen.getByText('Theme')).toBeInTheDocument()
   })
 })
