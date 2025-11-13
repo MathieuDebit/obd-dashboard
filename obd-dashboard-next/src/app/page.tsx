@@ -29,7 +29,7 @@ export default function Home() {
     <div  >
       <Map />
 
-      <div className="absolute w-full h-full top-0 left-0 m-5 pointer-events-none">
+      <div className="absolute w-full bottom-0 left-0 mb-5 pointer-events-none flex justify-center">
         <div className="w-100 pointer-events-auto">
           <GPSCarData chartData={chartData} chartConfig={chartConfig} />
         </div>
