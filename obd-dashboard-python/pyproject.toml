@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "obd-dashboard-server"
+version = "0.1.0"
+description = "WebSocket bridge streaming OBD-II telemetry for the dashboard UI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Dev"}]
+dependencies = [
+  "obd @ git+https://github.com/brendan-w/python-OBD.git",
+  "websockets>=10.0",
+  "ELM327-emulator",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+obd-dashboard-server = "obd_dashboard_server.server:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["obd_dashboard_server*"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra"
+testpaths = ["tests"]
