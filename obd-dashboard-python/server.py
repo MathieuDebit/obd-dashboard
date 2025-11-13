@@ -27,7 +27,33 @@ import websockets
 
 if TYPE_CHECKING:
     from obd import OBD, OBDCommand
-    from websockets.server import WebSocketServerProtocol
+    from websockets.legacy.server import WebSocketServerProtocol
+
+
+_COLOR_RESET = "\033[0m"
+_COLOR_MAP = {
+    "info": "\033[36m",      # cyan
+    "success": "\033[32m",   # green
+    "warning": "\033[33m",   # yellow
+    "error": "\033[31m",     # red
+}
+
+
+def log(message: str, level: str = "info") -> None:
+    """
+    Emit a tagged, colorized log line to stderr.
+
+    Args:
+        message: Human-readable text to display.
+        level: Optional severity keyword (`info`, `success`, `warning`, `error`).
+
+    Returns:
+        None. Writes the formatted string directly to stderr.
+    """
+
+    color = _COLOR_MAP.get(level, "")
+    reset = _COLOR_RESET if color else ""
+    print(f"{color}[obd-ws] {message}{reset}", file=sys.stderr)
 
 
 def build_command_list(connection: "OBD", only_supported: bool) -> List["OBDCommand"]:
@@ -42,13 +68,17 @@ def build_command_list(connection: "OBD", only_supported: bool) -> List["OBDComm
         A list of `OBDCommand` objects ready to be queried.
     """
 
+    commands: List["OBDCommand"]
     if only_supported:
-        return list(connection.supported_commands)
-    available: Iterable["OBDCommand"] = cast(Iterable["OBDCommand"], getattr(obd, "commands", []))
-    return [c for c in available if getattr(c, "mode", None) == 1 and getattr(c, "pid", None) is not None]
+        commands = list(connection.supported_commands)
+    else:
+        available: Iterable["OBDCommand"] = cast(Iterable["OBDCommand"], getattr(obd, "commands", []))
+        commands = [c for c in available if getattr(c, "mode", None) == 1 and getattr(c, "pid", None) is not None]
+    log(f"Prepared {len(commands)} commands (only_supported={only_supported}).")
+    return commands
 
 
-async def _push_latest(queue: asyncio.Queue, payload: Dict[str, Any]) -> None:
+async def _push_latest(queue: asyncio.Queue[Dict[str, Any]], payload: Dict[str, Any]) -> None:
     """
     Keep only the most recent payload in the single-slot queue.
 
@@ -58,15 +88,19 @@ async def _push_latest(queue: asyncio.Queue, payload: Dict[str, Any]) -> None:
 
     Returns:
         None. Discards the previous payload if the queue is full.
+
+    The websocket consumers only care about the newest sample, so a bounded queue
+    avoids unnecessary backlog and backpressure handling in the rest of the code.
     """
 
     if queue.full():
         with contextlib.suppress(asyncio.QueueEmpty):
             queue.get_nowait()
+        log("Dropped stale sample from queue to keep the latest payload.", level="warning")
     await queue.put(payload)
 
 
-async def poll_obd(connection: "OBD", cmds: List["OBDCommand"], interval: float, queue: asyncio.Queue) -> None:
+async def poll_obd(connection: "OBD", cmds: List["OBDCommand"], interval: float, queue: asyncio.Queue[Dict[str, Any]]) -> None:
     """
     Continuously query the ECU and enqueue JSON-ready payloads.
 
@@ -86,7 +120,7 @@ async def poll_obd(connection: "OBD", cmds: List["OBDCommand"], interval: float,
             try:
                 rsp = connection.query(cmd)
             except Exception as exc:
-                print(f"[poll] Failed to query {getattr(cmd, 'name', cmd)}: {exc}", file=sys.stderr)
+                log(f"Failed to query {getattr(cmd, 'name', cmd)}: {exc}", level="warning")
                 continue
             if rsp is None or rsp.is_null():
                 continue
@@ -102,7 +136,7 @@ async def poll_obd(connection: "OBD", cmds: List["OBDCommand"], interval: float,
         await asyncio.sleep(interval)
 
 
-async def consumer_handler(websocket: "WebSocketServerProtocol", queue: asyncio.Queue) -> None:
+async def consumer_handler(websocket: "WebSocketServerProtocol", queue: asyncio.Queue[Dict[str, Any]]) -> None:
     """
     Relay queue entries to a connected WebSocket client until they disconnect.
 
@@ -114,12 +148,15 @@ async def consumer_handler(websocket: "WebSocketServerProtocol", queue: asyncio.
         None. Completes when the websocket is closed.
     """
 
+    peer = getattr(websocket, "remote_address", "unknown")
+    log(f"Client connected: {peer}.")
     try:
         while True:
             data = await queue.get()
             await websocket.send(json.dumps(data, default=str))
     except websockets.exceptions.ConnectionClosed:
-        pass
+        log(f"Client disconnected: {peer}.")
+
 
 async def main_async(args: argparse.Namespace) -> None:
     """
@@ -132,16 +169,16 @@ async def main_async(args: argparse.Namespace) -> None:
         None. Blocks until the websocket server finishes or the process exits.
     """
 
-    print("Connecting to ECU...", file=sys.stderr)
+    log("Connecting to ECU...")
     connection = obd.OBD(portstr=args.port, baudrate=args.baudrate, fast=False, timeout=2)
     if not connection.is_connected():
-        print("Unable to connect. Check interface, port or baudrate.", file=sys.stderr)
+        log("Unable to connect. Check interface, port or baudrate.", level="error")
         sys.exit(1)
 
     poll_task = None
     try:
         cmds = build_command_list(connection, args.only_supported)
-        print(f"Streaming {len(cmds)} PIDs every {args.interval}s on ws://0.0.0.0:{args.ws_port}", file=sys.stderr)
+        log(f"Streaming {len(cmds)} PIDs every {args.interval}s on ws://0.0.0.0:{args.ws_port}")
 
         queue = asyncio.Queue(maxsize=1)
         poll_task = asyncio.create_task(poll_obd(connection, cmds, args.interval, queue))
@@ -153,6 +190,7 @@ async def main_async(args: argparse.Namespace) -> None:
         serve_kwargs = {"host": "0.0.0.0", "port": args.ws_port}
 
         try:
+            log(f"WebSocket server listening on ws://{serve_kwargs['host']}:{serve_kwargs['port']}", level="success")
             async with websockets.serve(handler, **serve_kwargs):
                 await asyncio.Future()
         finally:
@@ -163,6 +201,7 @@ async def main_async(args: argparse.Namespace) -> None:
     finally:
         with contextlib.suppress(Exception):
             connection.close()
+        log("OBD connection closed and websocket server stopped.")
 
 def main():
     """
