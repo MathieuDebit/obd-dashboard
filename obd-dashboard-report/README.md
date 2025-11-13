@@ -23,7 +23,7 @@ rm -rf .venv
 ```bash
 obdtools --help
 
-obdtools log --port /dev/ttyUSB0 --interval 1.0 --out outputs/csv/obd_all --ods --html-export
+obdtools log -- --port /dev/ttyUSB0 --interval 1.0 --out outputs/csv/obd_all --ods --html-export
 
 # Convert CSV → ODS (Calc) later
 obdtools calc --in outputs/csv/trip.csv --out outputs/calc/trip.ods

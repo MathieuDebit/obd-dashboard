@@ -45,6 +45,7 @@ DEFAULT_PORT = "/dev/ttyUSB0"
 DEFAULT_WS_PORT = 8765
 DEFAULT_EMULATOR_TIMEOUT = 5.0
 _EMULATOR_PORT_PATTERN = re.compile(r"(/dev/pts/\d+)")
+_DEFAULT_BAUD_PROBE_ORDER: tuple[Optional[int], ...] = (None, 115200, 38400, 9600)
 
 
 def _mode1_commands() -> List["OBDCommand"]:
@@ -329,10 +330,33 @@ async def main_async(args: argparse.Namespace) -> None:
                 args.emulator_scenario, args.emulator_timeout
             )
 
-        log(f"Connecting to ECU on {selected_port}...")
-        connection = obd.OBD(portstr=selected_port, baudrate=args.baudrate, fast=False, timeout=2)
-        if not connection.is_connected():
-            log("Unable to connect. Check interface, port or baudrate.", level="error")
+        baud_attempts: List[Optional[int]]
+        if args.baudrate is not None:
+            baud_attempts = [args.baudrate]
+        else:
+            baud_attempts = list(_DEFAULT_BAUD_PROBE_ORDER)
+
+        last_exc: Optional[BaseException] = None
+        for baud in baud_attempts:
+            baud_label = "auto" if baud is None else str(baud)
+            log(f"Connecting to ECU on {selected_port} (baud={baud_label})...")
+            try:
+                candidate = obd.OBD(portstr=selected_port, baudrate=baud, fast=False, timeout=2)
+            except Exception as exc:
+                last_exc = exc
+                log(f"Serial open failed at baud={baud_label}: {exc}", level="warning")
+                continue
+            if candidate.is_connected():
+                connection = candidate
+                break
+            last_exc = RuntimeError(candidate.status())
+            log(f"ECU did not respond at baud={baud_label}; trying next option.", level="warning")
+            with contextlib.suppress(Exception):
+                candidate.close()
+
+        if not connection:
+            error_tail = f" (last error: {last_exc})" if last_exc else ""
+            log(f"Unable to connect after trying {len(baud_attempts)} baud rate option(s){error_tail}.", level="error")
             sys.exit(1)
 
         poll_task = None
@@ -406,7 +430,12 @@ def main():
         default=None,
         help="Serial port or socket, e.g. /dev/ttyUSB0 or socket://localhost:35000 (default: auto)",
     )
-    parser.add_argument("--baudrate", type=int, default=38400, help="Serial baud rate (default 38400)")
+    parser.add_argument(
+        "--baudrate",
+        type=int,
+        default=None,
+        help="Serial baud rate (default auto-detect; provide to force a value)",
+    )
     parser.add_argument("--interval", type=float, default=1.0, help="Polling interval seconds (min 0.2, default 1.0)")
     parser.add_argument("--only_supported", action="store_true", help="Query only PIDs reported supported by ECU")
     parser.add_argument("--host", default="0.0.0.0", help="WebSocket bind host (default 0.0.0.0)")
