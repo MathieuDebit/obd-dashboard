@@ -6,7 +6,7 @@ import Nav from "@/ui/nav";
 
 export default function AppShell({ children }: PropsWithChildren) {
   return (
-    <div className="flex h-screen flex-row p-3">
+    <div className="flex h-screen flex-col p-3">
       <Nav />
 
       <ScrollArea className="bg-background flex grow overflow-hidden rounded-xl border p-4">
