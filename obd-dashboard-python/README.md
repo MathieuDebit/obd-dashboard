@@ -2,9 +2,15 @@
 
 ## TL;DR
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
+
 python3 -m elm -s car
 python3 server.py --only_supported --port /dev/pts/5
+
+# exit venv
+deactivate
 ```
 
 If
