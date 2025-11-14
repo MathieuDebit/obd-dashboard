@@ -19,13 +19,7 @@ interface RadialChartProps {
 
 export default function RadialChart({ className, chartData, chartConfig }: RadialChartProps) {
   if (chartData.length === 0) {
-    return (
-      <div className={cn("aspect-square h-[150px]", className)}>
-        <div className="flex h-full w-full items-center justify-center rounded-xl border text-xs text-muted-foreground">
-          Waiting for data
-        </div>
-      </div>
-    )
+    return <div className={cn("aspect-square h-[150px]", className)} />
   }
 
   const sample = chartData[0];
