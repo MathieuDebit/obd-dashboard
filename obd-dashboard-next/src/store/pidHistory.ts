@@ -67,17 +67,18 @@ export function recordPidSamples(response: OBDServerResponse) {
       return;
     }
 
-    const samples = historyByPid.get(pid) ?? [];
-    samples.push({ timestamp: response.timestamp, value: numericValue });
-    const changed = pruneSamples(samples, cutoff);
+    const existing = historyByPid.get(pid) ?? [];
+    const nextSamples = existing.length > 0 ? [...existing] : [];
+    nextSamples.push({ timestamp: response.timestamp, value: numericValue });
+    const changed = pruneSamples(nextSamples, cutoff);
 
-    if (samples.length === 0) {
+    if (nextSamples.length === 0) {
       historyByPid.delete(pid);
     } else {
-      historyByPid.set(pid, samples);
+      historyByPid.set(pid, nextSamples);
     }
 
-    updated = updated || changed || samples.length > 0;
+    updated = updated || changed || nextSamples.length > 0;
   });
 
   if (updated) {
