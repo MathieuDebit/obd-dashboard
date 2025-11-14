@@ -1,0 +1,263 @@
+{
+  "pids": {
+    "RPM": {
+      "name": "Régime moteur",
+      "description": "**Régime moteur**  \nMesure le nombre de tours par minute du vilebrequin.\n\n**Pourquoi c’est utile ?**  \n- Surveiller le ralenti et éviter le calage  \n- Optimiser les passages de vitesse  \n- Prévenir l’usure prématurée du moteur\n\n**Attention :**  \nUn régime trop bas peut provoquer un calage, un régime trop élevé un sur-régime."
+    },
+    "SPEED": {
+      "name": "Vitesse véhicule",
+      "description": "**Vitesse véhicule**  \nAffiche la vitesse instantanée en kilomètres par heure.\n\n**Pourquoi c’est utile ?**  \n- Ajuster finement la conduite  \n- Garantir le respect des limitations  \n- Adapter le couple moteur à la vitesse\n\n**Attention :**  \nUne valeur nulle ou erratique peut indiquer un capteur de vitesse défaillant."
+    },
+    "COOLANT_TEMP": {
+      "name": "Temp. liquide",
+      "description": "**Température du liquide de refroidissement**  \nMesure en °C la chaleur émise par le moteur.\n\n**Pourquoi c’est utile ?**  \n- Détecter une surchauffe (au-delà de 100 °C)  \n- Vérifier le bon fonctionnement du thermostat  \n- Optimiser la consommation et les émissions\n\n**Attention :**  \nUne température trop basse signifie un moteur qui ne chauffe pas correctement."
+    },
+    "INTAKE_TEMP": {
+      "name": "Temp. admission",
+      "description": "**Température d’admission**  \nIndique en °C la chaleur de l’air entrant dans le collecteur.\n\n**Pourquoi c’est utile ?**  \n- Calculer le rapport air/carburant  \n- Adapter l’avance à l’allumage  \n- Optimiser le rendement moteur\n\n**Attention :**  \nUn capteur sale ou défectueux fausse le dosage du carburant."
+    },
+    "INTAKE_PRESSURE": {
+      "name": "Pression admission",
+      "description": "**Pression d’admission**  \nMesure en kPa la pression de l’air dans le collecteur.\n\n**Pourquoi c’est utile ?**  \n- Évaluer la charge réelle du moteur  \n- Contrôler les systèmes de suralimentation  \n- Adapter l’injection de carburant\n\n**Attention :**  \nUne pression anormalement basse signale une fuite ou un colmatage."
+    },
+    "BAROMETRIC_PRESSURE": {
+      "name": "Pression barométrique",
+      "description": "**Pression barométrique**  \nIndique en kPa la pression atmosphérique ambiante.\n\n**Pourquoi c’est utile ?**  \n- Corriger le mélange air/carburant selon l’altitude  \n- Ajuster l’avance à l’allumage en fonction du climat\n\n**Attention :**  \nUn capteur défectueux entraîne un mélange trop riche ou trop pauvre."
+    },
+    "TIMING_ADVANCE": {
+      "name": "Avance allumage",
+      "description": "**Avance à l’allumage**  \nExprimée en degrés avant le point mort haut (BTDC).\n\n**Pourquoi c’est utile ?**  \n- Maximiser la puissance  \n- Réduire la consommation  \n- Éviter les cliquetis\n\n**Attention :**  \nUne avance excessive provoque des cognements, une avance insuffisante une perte de puissance."
+    },
+    "THROTTLE_POS": {
+      "name": "Ouverture papillon",
+      "description": "**Position du papillon (TPS)**  \nPourcentage d’ouverture de la valve d’admission.\n\n**Pourquoi c’est utile ?**  \n- Piloter précisément la charge moteur  \n- Assurer une réponse fluide à l’accélérateur\n\n**Attention :**  \nUn capteur encrassé rend la réponse moteur saccadée."
+    },
+    "THROTTLE_ACTUATOR": {
+      "name": "Actionneur papillon",
+      "description": "**Consigne actionneur papillon**  \nPourcentage de commande envoyé par l’ECU au servomoteur.\n\n**Pourquoi c’est utile ?**  \n- Vérifier la correspondance consigne/position réelle  \n- Détecter un servomoteur bloqué\n\n**Attention :**  \nUne divergence persistante ≥ 10 % déclenche un mode dégradé."
+    },
+    "THROTTLE_POS_B": {
+      "name": "Papillon (capteur B)",
+      "description": "**Capteur B du papillon**  \nSignal secondaire validant la position du papillon.\n\n**Pourquoi c’est utile ?**  \n- Créer une redondance de sécurité  \n- Détecter toute incohérence A/B\n\n**Attention :**  \nUn désaccord entre A et B génère un code d’erreur."
+    },
+    "RELATIVE_THROTTLE_POS": {
+      "name": "Papillon (relatif)",
+      "description": "**Position relative du papillon**  \nComparaison à une valeur de référence interne.\n\n**Pourquoi c’est utile ?**  \n- Identifier les dérives de calibration  \n- Détecter l’encrassement progressif\n\n**Attention :**  \nDes écarts importants altèrent la consommation."
+    },
+    "ENGINE_LOAD": {
+      "name": "Charge moteur",
+      "description": "**Charge moteur**  \nPourcentage de sollicitation par rapport à la charge max.\n\n**Pourquoi c’est utile ?**  \n- Diagnostiquer une sursollicitation (remorquage, montée)  \n- Identifier un sous-régime chronique\n\n**Attention :**  \nUne charge anormale signale un filtre à air sale ou un problème mécanique."
+    },
+    "ABSOLUTE_LOAD": {
+      "name": "Charge absolue",
+      "description": "**Charge absolue**  \nCalcul ECU basé sur MAF/MAP et régime moteur.\n\n**Pourquoi c’est utile ?**  \n- Obtenir une mesure stable et reproductible  \n- Comparer plusieurs sessions de conduite\n\n**Attention :**  \nDes valeurs aberrantes révèlent souvent un capteur défaillant."
+    },
+    "LONG_FUEL_TRIM_1": {
+      "name": "LTFT Banc 1",
+      "description": "**Long Term Fuel Trim (LTFT)**  \nCorrection carburant à long terme sur le banc 1.\n\n**Pourquoi c’est utile ?**  \n- Compense les écarts persistants du mélange  \n- Diagnostiquer fuites ou injecteurs encrassés\n\n**Attention :**  \nDes valeurs > ±25 % nécessitent une inspection approfondie."
+    },
+    "SHORT_FUEL_TRIM_1": {
+      "name": "STFT Banc 1",
+      "description": "**Short Term Fuel Trim (STFT)**  \nAjustement instantané du mélange air/carburant.\n\n**Pourquoi c’est utile ?**  \n- Réagir aux variations rapides du capteur lambda  \n- Maintenir l’efficacité de la combustion\n\n**Attention :**  \nDes oscillations trop importantes indiquent souvent une sonde lambda vieillissante."
+    },
+    "MAF": {
+      "name": "Débit massique air",
+      "description": "**Débit massique d’air (MAF)**  \nMesure du flux d’air entrant en g/s.\n\n**Pourquoi c’est utile ?**  \n- Dosage précis de l’injection  \n- Optimisation de la consommation\n\n**Attention :**  \nUn capteur MAF sale provoque des ratés d’allumage."
+    },
+    "EVAPORATIVE_PURGE": {
+      "name": "Purge EVAP",
+      "description": "**Purge EVAP**  \nOuverture de la vanne de purge des vapeurs carburant.\n\n**Pourquoi c’est utile ?**  \n- Réduire les émissions polluantes  \n- Maintenir l’étanchéité du circuit\n\n**Attention :**  \nUne vanne bloquée déclenche un code P044x."
+    },
+    "COMMANDED_EGR": {
+      "name": "EGR commandée",
+      "description": "**Commande EGR**  \nPourcentage d’ouverture demandé pour la recirculation des gaz.\n\n**Pourquoi c’est utile ?**  \n- Réduction des NOₓ  \n- Abaissement de la température de combustion\n\n**Attention :**  \nUne EGR qui ne suit pas la consigne engendre un voyant moteur."
+    },
+    "CATALYST_TEMP_B1S1": {
+      "name": "T° catalyseur B1S1",
+      "description": "**Température catalyseur amont**  \nMesure en °C avant le pot catalytique.\n\n**Pourquoi c’est utile ?**  \n- Vérifier l’état du catalyseur  \n- Prévenir la surchauffe\n\n**Attention :**  \nDes températures > 900 °C risquent d’endommager le catalyseur."
+    },
+    "CATALYST_TEMP_B1S2": {
+      "name": "T° catalyseur B1S2",
+      "description": "**Température catalyseur aval**  \nMesure en °C après le pot catalytique.\n\n**Pourquoi c’est utile ?**  \n- Contrôler l’efficacité de la conversion  \n- Détecter un catalyseur encrassé\n\n**Attention :**  \nUne température basse peut indiquer un catalyseur inefficace."
+    },
+    "O2_S1_WR_VOLTAGE": {
+      "name": "Lambda amont (V)",
+      "description": "**Tension sonde lambda amont**  \nMesure en volts d’une sonde large bande.\n\n**Pourquoi c’est utile ?**  \n- Dosage précis du mélange air/carburant  \n- Suivi de la performance de la sonde\n\n**Attention :**  \nUne tension instable signale souvent un vieillissement de la sonde."
+    },
+    "O2_S1_WR_CURRENT": {
+      "name": "Lambda amont (mA)",
+      "description": "**Courant sonde lambda amont**  \nMesure en mA liée au chauffage interne de la sonde.\n\n**Pourquoi c’est utile ?**  \n- Vérifier le circuit de chauffage  \n- Évaluer la réactivité de la sonde\n\n**Attention :**  \nUn courant hors plage indique un problème électrique."
+    },
+    "O2_B1S2": {
+      "name": "Lambda aval (V)",
+      "description": "**Tension sonde lambda aval**  \nMesure en volts après le catalyseur.\n\n**Pourquoi c’est utile ?**  \n- Suivre l’efficacité du pot catalytique  \n- Détecter un catalyseur bouché\n\n**Attention :**  \nDes tensions identiques à l’amont révèlent un catalyseur inefficace."
+    },
+    "ELM_VOLTAGE": {
+      "name": "Tension interface",
+      "description": "**Tension module OBD (ELM327)**  \nMesure en volts de l’alimentation du dongle.\n\n**Pourquoi c’est utile ?**  \n- Assurer la communication OBD  \n- Vérifier l’état du module\n\n**Attention :**  \nUne tension trop basse coupe la liaison OBD."
+    },
+    "CONTROL_MODULE_VOLTAGE": {
+      "name": "Tension calculateur",
+      "description": "**Tension ECU**  \nMesure en volts de l’alimentation du calculateur.\n\n**Pourquoi c’est utile ?**  \n- Prévenir les redémarrages aléatoires  \n- Garantir la stabilité de l’ECU\n\n**Attention :**  \nDes fluctuations importantes peuvent endommager l’ECU."
+    },
+    "RUN_TIME": {
+      "name": "Temps moteur allumé",
+      "description": "**Temps moteur allumé**  \nDurée en secondes depuis le dernier démarrage.\n\n**Pourquoi c’est utile ?**  \n- Planifier les intervalles de maintenance  \n- Vérifier le temps de chauffe avant montée en régime"
+    },
+    "RUN_TIME_MIL": {
+      "name": "Run-time depuis MIL",
+      "description": "**Durée depuis témoin défaut**  \nTemps en secondes écoulé depuis l’allumage du MIL.\n\n**Pourquoi c’est utile ?**  \n- Suivre la durée d’un défaut actif  \n- Évaluer l’impact sur la conduite"
+    },
+    "DISTANCE_W_MIL": {
+      "name": "Distance avec MIL",
+      "description": "**Distance depuis témoin défaut**  \nKilomètres parcourus depuis que le MIL s’est allumé.\n\n**Pourquoi c’est utile ?**  \n- Mesurer le trajet effectué malgré un défaut  \n- Anticiper une réparation"
+    },
+    "TIME_SINCE_DTC_CLEARED": {
+      "name": "Temps depuis RAZ DTC",
+      "description": "**Temps depuis effacement DTC**  \nDurée en secondes depuis la remise à zéro des codes défaut.\n\n**Pourquoi c’est utile ?**  \n- Vérifier que le système a eu le temps de tester tous les capteurs"
+    },
+    "DISTANCE_SINCE_DTC_CLEAR": {
+      "name": "Distance depuis RAZ DTC",
+      "description": "**Distance depuis effacement DTC**  \nKilomètres parcourus depuis la réinitialisation des codes défaut.\n\n**Pourquoi c’est utile ?**  \n- Suivre l’évolution de l’auto-diagnostic sur la longue distance"
+    }
+  },
+  "ui": {
+    "chart.tooltip.time": "Temps",
+    "commands.livePids.heading": "PIDs véhicule en direct",
+    "commands.correlations.heading": "Corrélations",
+    "commands.correlations.pending": "En attente de données",
+    "commands.chart.empty": "Sélectionnez un PID ou une corrélation pour afficher le graphique.",
+    "commands.modal.noDescription": "Aucune description n'est disponible pour ce PID pour le moment.",
+    "commands.modal.close": "Fermer la description",
+    "commands.status.error": "Échec du chargement",
+    "commands.status.loading": "Chargement...",
+    "commands.card.rpm_speed.title": "Régime vs vitesse",
+    "commands.card.rpm_speed.description": "Visualisez comment le régime moteur se rapporte à la vitesse du véhicule sur la dernière minute.",
+    "commands.card.rpm_speed.primary": "Régime moteur",
+    "commands.card.rpm_speed.secondary": "Vitesse du véhicule",
+    "commands.card.throttle_load.title": "Accélérateur vs charge moteur",
+    "commands.card.throttle_load.description": "Comparez la sollicitation de l'accélérateur avec la charge moteur rapportée par l'ECU.",
+    "commands.card.throttle_load.primary": "Position de l'accélérateur",
+    "commands.card.throttle_load.secondary": "Charge moteur",
+    "commands.chart.infoButton": "Afficher la description",
+    "core.heading": "Télémetrie essentielle",
+    "core.caption": "Affichage des signaux essentiels de l'émulateur. Lancez le serveur avec --emulator-all-pids pour voir tous les PIDs.",
+    "core.missing": "Pas encore de données",
+    "settings.tab.general": "Général",
+    "settings.tab.vehicle": "Véhicule",
+    "settings.tab.obd": "OBD",
+    "settings.tab.about": "À propos",
+    "settings.language.label": "Langue",
+    "settings.language.fr": "Français",
+    "settings.language.en": "Anglais",
+    "settings.theme.label": "Thème",
+    "settings.theme.placeholder": "Choisir un thème",
+    "settings.theme.light": "Clair",
+    "settings.theme.dark": "Sombre",
+    "settings.vehicle.model": "Modèle",
+    "settings.vehicle.color": "Couleur",
+    "settings.vehicle.brand.nissan": "Nissan",
+    "settings.vehicle.brand.toyota": "Toyota",
+    "settings.vehicle.model.nissan_r34": "Nissan Skyline R34 GT-R",
+    "settings.vehicle.model.nissan_200sx": "Nissan 200SX",
+    "settings.vehicle.model.toyota_supra": "Toyota Supra MK4",
+    "settings.vehicle.model.toyota_ae86": "Toyota AE86",
+    "settings.vehicle.color.red": "Rouge",
+    "settings.vehicle.color.green": "Vert",
+    "settings.vehicle.color.blue": "Bleu",
+    "settings.obd.restart.label": "Redémarrer le serveur",
+    "settings.obd.restart.button": "Redémarrer",
+    "settings.about.version": "Version de l'application",
+    "settings.about.check": "Vérifier les mises à jour",
+    "settings.about.check.button": "Vérifier",
+    "diagnostics.specs.heading": "Spécifications du véhicule",
+    "diagnostics.specs.subheading": "Renault Clio II Phase 2 1.4L 16V Extreme",
+    "diagnostics.specs.overview.title": "Vue d'ensemble",
+    "diagnostics.specs.overview.model.label": "Modèle",
+    "diagnostics.specs.overview.model.value": "Renault Clio II Phase 2 Extreme",
+    "diagnostics.specs.overview.body.label": "Carrosserie",
+    "diagnostics.specs.overview.body.value": "Hayon · 3 portes",
+    "diagnostics.specs.overview.seats.label": "Places",
+    "diagnostics.specs.overview.seats.value": "5 (configuration 2+3)",
+    "diagnostics.specs.overview.production.label": "Production",
+    "diagnostics.specs.overview.production.value": "2001 – 2003",
+    "diagnostics.specs.powertrain.title": "Groupe motopropulseur",
+    "diagnostics.specs.powertrain.engine.label": "Moteur",
+    "diagnostics.specs.powertrain.engine.value": "1,4 L 4 cylindres en ligne DOHC 16 soupapes (K4J)",
+    "diagnostics.specs.powertrain.displacement.label": "Cylindrée",
+    "diagnostics.specs.powertrain.displacement.value": "1390 cm³",
+    "diagnostics.specs.powertrain.aspiration.label": "Aspiration",
+    "diagnostics.specs.powertrain.aspiration.value": "Atmosphérique",
+    "diagnostics.specs.powertrain.compression.label": "Compression",
+    "diagnostics.specs.powertrain.compression.value": "10:1",
+    "diagnostics.specs.powertrain.fuelSystem.label": "Alimentation",
+    "diagnostics.specs.powertrain.fuelSystem.value": "Injection multipoint indirecte",
+    "diagnostics.specs.powertrain.layout.label": "Architecture",
+    "diagnostics.specs.powertrain.layout.value": "Avant transversal · Traction",
+    "diagnostics.specs.powertrain.transmission.label": "Transmission",
+    "diagnostics.specs.powertrain.transmission.value": "Manuelle 5 rapports",
+    "diagnostics.specs.performance.title": "Performances",
+    "diagnostics.specs.performance.power.label": "Puissance",
+    "diagnostics.specs.performance.power.value": "98 ch à 6000 tr/min",
+    "diagnostics.specs.performance.torque.label": "Couple",
+    "diagnostics.specs.performance.torque.value": "127 Nm à 3750 tr/min",
+    "diagnostics.specs.performance.acceleration.label": "0-100 km/h",
+    "diagnostics.specs.performance.acceleration.value": "10,5 s",
+    "diagnostics.specs.performance.topSpeed.label": "Vitesse max",
+    "diagnostics.specs.performance.topSpeed.value": "185 km/h",
+    "diagnostics.specs.performance.weightToPower.label": "Rapport poids/puissance",
+    "diagnostics.specs.performance.weightToPower.value": "10 kg/ch",
+    "diagnostics.specs.fuel.title": "Carburant et émissions",
+    "diagnostics.specs.fuel.type.label": "Carburant",
+    "diagnostics.specs.fuel.type.value": "Essence (Euro 3)",
+    "diagnostics.specs.fuel.city.label": "Conso urbaine",
+    "diagnostics.specs.fuel.city.value": "9,2 L/100 km",
+    "diagnostics.specs.fuel.highway.label": "Conso route",
+    "diagnostics.specs.fuel.highway.value": "5,3 L/100 km",
+    "diagnostics.specs.fuel.combined.label": "Conso mixte",
+    "diagnostics.specs.fuel.combined.value": "6,7 L/100 km",
+    "diagnostics.specs.fuel.co2.label": "Émissions CO₂",
+    "diagnostics.specs.fuel.co2.value": "160 g/km",
+    "diagnostics.specs.fuel.tank.label": "Réservoir",
+    "diagnostics.specs.fuel.tank.value": "50 L",
+    "diagnostics.specs.fuel.range.label": "Autonomie typique",
+    "diagnostics.specs.fuel.range.value": "≈746 km",
+    "diagnostics.specs.dimensions.title": "Dimensions et poids",
+    "diagnostics.specs.dimensions.wheelbase.label": "Empattement",
+    "diagnostics.specs.dimensions.wheelbase.value": "247,2 cm",
+    "diagnostics.specs.dimensions.length.label": "Longueur",
+    "diagnostics.specs.dimensions.length.value": "381,2 cm",
+    "diagnostics.specs.dimensions.width.label": "Largeur",
+    "diagnostics.specs.dimensions.width.value": "163,9 cm",
+    "diagnostics.specs.dimensions.height.label": "Hauteur",
+    "diagnostics.specs.dimensions.height.value": "141,7 cm",
+    "diagnostics.specs.dimensions.frontTrack.label": "Voie avant",
+    "diagnostics.specs.dimensions.frontTrack.value": "139,2 cm",
+    "diagnostics.specs.dimensions.rearTrack.label": "Voie arrière",
+    "diagnostics.specs.dimensions.rearTrack.value": "137,2 cm",
+    "diagnostics.specs.dimensions.curbWeight.label": "Poids à vide",
+    "diagnostics.specs.dimensions.curbWeight.value": "980 kg",
+    "diagnostics.specs.dimensions.grossWeight.label": "Poids max",
+    "diagnostics.specs.dimensions.grossWeight.value": "1525 kg",
+    "diagnostics.specs.cabin.title": "Habitacle et coffre",
+    "diagnostics.specs.cabin.seatDistribution.label": "Répartition des sièges",
+    "diagnostics.specs.cabin.seatDistribution.value": "2 à l'avant · 3 à l'arrière",
+    "diagnostics.specs.cabin.boot.label": "Volume de coffre",
+    "diagnostics.specs.cabin.boot.value": "255 L · 1037 L sièges rabattus",
+    "diagnostics.specs.chassis.title": "Châssis et direction",
+    "diagnostics.specs.chassis.frontBrakes.label": "Freins avant",
+    "diagnostics.specs.chassis.frontBrakes.value": "Disques ventilés",
+    "diagnostics.specs.chassis.rearBrakes.label": "Freins arrière",
+    "diagnostics.specs.chassis.rearBrakes.value": "Disques pleins",
+    "diagnostics.specs.chassis.frontTyres.label": "Pneus avant",
+    "diagnostics.specs.chassis.frontTyres.value": "185/55 R15",
+    "diagnostics.specs.chassis.rearTyres.label": "Pneus arrière",
+    "diagnostics.specs.chassis.rearTyres.value": "185/55 R15",
+    "diagnostics.specs.chassis.steering.label": "Direction",
+    "diagnostics.specs.chassis.steering.value": "Crémaillère",
+    "diagnostics.specs.chassis.frontSuspension.label": "Suspension avant",
+    "diagnostics.specs.chassis.frontSuspension.value": "Jambes MacPherson avec ressorts hélicoïdaux",
+    "diagnostics.specs.chassis.rearSuspension.label": "Suspension arrière",
+    "diagnostics.specs.chassis.rearSuspension.value": "Essieu à barre de torsion avec ressorts hélicoïdaux"
+  }
+}

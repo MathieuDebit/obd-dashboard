@@ -22,3 +22,7 @@ behaviour through the following optional environment variables:
 | `NEXT_PUBLIC_WS_RETRY_MAX_DELAY_MS` | Upper bound for the exponential backoff delay. | `15000` |
 
 Everything happens client-side so the app stays offline-ready.
+
+## Development
+
+Run `pnpm intl:verify` to ensure every locale file exposes the same keys before committing translations.
