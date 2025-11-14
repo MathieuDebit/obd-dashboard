@@ -135,8 +135,15 @@ export default function CarScene() {
   }, []);
 
   const handleCanvasCreated = useCallback(({ gl }: RootState) => {
-    canvasElementRef.current = gl.domElement;
-    gl.domElement.addEventListener('webglcontextlost', handleContextLost, false);
+    const element = gl.domElement;
+    canvasElementRef.current = element;
+    element.addEventListener('webglcontextlost', handleContextLost, false);
+
+    return () => {
+      element.removeEventListener('webglcontextlost', handleContextLost, false);
+      gl.forceContextLoss();
+      gl.dispose();
+    };
   }, [handleContextLost]);
 
   useEffect(() => {
