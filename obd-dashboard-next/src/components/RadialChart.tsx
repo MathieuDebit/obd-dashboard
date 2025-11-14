@@ -18,6 +18,21 @@ interface RadialChartProps {
 }
 
 export default function RadialChart({ className, chartData, chartConfig }: RadialChartProps) {
+  if (chartData.length === 0) {
+    return (
+      <div className={cn("aspect-square h-[150px]", className)}>
+        <div className="flex h-full w-full items-center justify-center rounded-xl border text-xs text-muted-foreground">
+          Waiting for data
+        </div>
+      </div>
+    )
+  }
+
+  const sample = chartData[0];
+  const speedValue = Number.isFinite(sample.speed) ? sample.speed : 0;
+  const rpmValue = Number.isFinite(sample.rpm) ? sample.rpm : 0;
+  const endAngle = rpmValue / -30 + 180;
+
   return (
     <ChartContainer
       config={chartConfig}
@@ -26,7 +41,7 @@ export default function RadialChart({ className, chartData, chartConfig }: Radia
       <RadialBarChart
         data={chartData}
         startAngle={200}
-        endAngle={chartData[0].rpm / -30 + 180}
+        endAngle={endAngle}
         innerRadius={65}
         outerRadius={87}
       >
@@ -47,7 +62,7 @@ export default function RadialChart({ className, chartData, chartConfig }: Radia
                       y={(viewBox.cy || 0) - 12}
                       className="fill-foreground text-4xl font-bold"
                     >
-                      {chartData[0].speed.toLocaleString() || '1'}
+                      {speedValue.toLocaleString()}
                     </tspan>
                     <tspan
                       x={viewBox.cx}
