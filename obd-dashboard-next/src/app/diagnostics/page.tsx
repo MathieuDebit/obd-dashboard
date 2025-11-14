@@ -2,10 +2,7 @@
 
 import { Card, CardContent } from "@/ui/card";
 import CarScene from "./CarScene";
-import { KeyboardEvent, useMemo, useState } from "react";
-import { cn } from "@/utils/classNames";
-import { ArrowRight, Car, TriangleAlert, X } from "lucide-react";
-import { Separator } from "@/ui/separator";
+import { useMemo, useState } from "react";
 import { ScrollArea } from "@/ui/scroll-area";
 import { useLanguage } from "@/app/LanguageContext";
 import { translateUi } from "@/utils/i18n";
@@ -309,8 +306,6 @@ const CAR_SPEC_DEFINITIONS: CarSpecDefinition[] = [
 
 export default function Page() {
   const { locale } = useLanguage();
-  const [opened, setOpened] = useState(false);
-  const [currentErrorCard, setCurrentErrorCard] = useState<string | null>(null);
 
   const t = (key: string, fallback: string) => translateUi(key, locale, fallback);
 
@@ -332,131 +327,9 @@ export default function Page() {
     "Renault Clio II Phase 2 1.4L 16V Extreme",
   );
 
-  const toogleOpen = () => {
-    setOpened((state) => !state);
-    setCurrentErrorCard(null);
-  }
-
-  const handleOpenErrorCard = (errorCode: string) => {
-    if (currentErrorCard === errorCode) {
-      setCurrentErrorCard(null);
-    } else {
-      setCurrentErrorCard(errorCode);
-    }
-  }
-
-  const handleKeyDown = (errorCode: string) => (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleOpenErrorCard(errorCode);
-    }
-  }
-
   return (
     <div>
       <CarScene />
-
-      <Card className={cn(
-        "z-20",
-        !opened && "absolute top-5 right-5 transition-[width,height,opacity,border] duration-200 delay-[200ms,200ms,250ms,200ms] ease-in-out w-15 h-15 opacity-0 border-0",
-          opened && "absolute top-5 right-5 transition-[width,height,opacity,border] duration-200 ease-in-out w-2/5 h-2/3 opacity-100 border",
-      )}>
-        <CardContent className={cn(
-          !opened && "pt-15 px-5 transition-[opacity] duration-300 delay-0 opacity-0",
-          opened && "pt-15 px-5 transition-[opacity] duration-300 delay-200 opacity-100",
-        )}>
-          <div className={cn(
-            currentErrorCard && "overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms, 100ms] delay-[500ms,500ms,500ms,0ms] h-0 opacity-0 m-0 p-0",
-            !currentErrorCard && "overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms, 500ms, 500ms,100ms] delay-[200ms,200ms,200ms,500ms] h-30 opacity-100 m-3"
-          )}>
-            <div className="text-lg font-bold">Nissan Skyline R34 GT-R</div>
-            <div className="text-sm">VIN : WP0ZZZ99ZTS39</div>
-            <div className="font-bold mt-8 mb-4">2 erreurs</div>
-          </div>
-          
-          <div className="">
-            <Card
-              className={cn(
-                !currentErrorCard && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[0ms,0ms,0ms,500ms] opacity-100 h-22",
-                currentErrorCard && currentErrorCard === 'P0170' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[400ms,0ms,0ms,500ms] opacity-100 h-97",
-                currentErrorCard && currentErrorCard !== 'P0170' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[500ms,500ms,500ms,0ms] opacity-0 h-0 p-0 m-0"
-              )}
-              role="button"
-              tabIndex={0}
-              aria-expanded={currentErrorCard === 'P0170'}
-              onClick={() => handleOpenErrorCard('P0170')}
-              onKeyDown={handleKeyDown('P0170')}
-            >
-              <CardContent className="">
-                <div className="flex flex-center">
-                  <div className="flex-1 mr-5">
-                    <div className="text-sm">Garniture de carburant (banque 1)</div>
-                    <div className="text-xs">Code défaut P0170</div>
-                  </div>
-                  {currentErrorCard === 'P0170' ? <X /> : <ArrowRight />}
-                </div>
-                { currentErrorCard === 'P0170' &&
-                  <div className="">
-                    <Separator className="mt-7 mb-5"/>
-                    <div className="text-sm">Ce code erreur indique un dysfonctionnement dans le système de carburant, pouvant affecter la performance globale du moteur.</div>
-                  </div>
-                  }
-              </CardContent>
-            </Card>
-
-            <Card
-              className={cn(
-                !currentErrorCard && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms, 500ms, 500ms,100ms] delay-[0ms,0ms,0ms,500ms] opacity-100 h-25",
-                currentErrorCard && currentErrorCard === 'P0320' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[400ms,0ms,0ms,500ms] opacity-100 h-97",
-                currentErrorCard && currentErrorCard !== 'P0320' && "mb-3 overflow-hidden transition-[height,margin,padding,opacity] duration-[500ms,500ms,500ms,100ms] delay-[500ms,500ms,500ms,0ms] opacity-0 h-0 p-0 m-0"
-              )}
-              role="button"
-              tabIndex={0}
-              aria-expanded={currentErrorCard === 'P0320'}
-              onClick={() => handleOpenErrorCard('P0320')}
-              onKeyDown={handleKeyDown('P0320')}
-            >
-              <CardContent className="">
-                <div className="flex flex-center">
-                  <div className="flex-1 mr-5">
-                    <div className="text-sm">Capteur de vilebrequin – panne du circuit</div>
-                    <div className="text-xs">Code défaut P0320</div>
-                  </div>
-                  {currentErrorCard === 'P0320' ? <X /> : <ArrowRight />}
-                </div>
-                { currentErrorCard === 'P0320' &&
-                  <div className="">
-                    <Separator className="mt-7 mb-5"/>
-                    <div className="text-sm">Ce code erreur indique une défaillance du capteur de vilebrequin, suggérant un problème potentiel dans le circuit de détection.</div>
-                  </div>
-                }
-              </CardContent>
-            </Card>
-          </div>
-          
-        </CardContent>
-      </Card>
-
-      <div
-        className="absolute top-9 right-9 size-12 flex justify-center items-center border-2 bg-primary-foreground rounded-lg"
-        role="button"
-        tabIndex={0}
-        aria-pressed={opened}
-        onClick={toogleOpen}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            toogleOpen();
-          }
-        }}
-      >
-        <Car size={30} />
-        <div className="absolute top-0 left-0 -translate-2">
-          <span className="absolute inline-flex size-7 -translate-1 rounded-full bg-orange-400 opacity-100"></span>
-          <span className="absolute inline-flex size-7 -translate-1 rounded-full bg-orange-300 opacity-100"></span>
-          <TriangleAlert size={20} className="relative" />
-        </div>
-      </div>
 
       <div className="absolute bottom-0 left-0 z-10 w-full h-1/2 p-5">
         <Card className="h-full w-full bg-background/95 backdrop-blur pointer-events-auto">
