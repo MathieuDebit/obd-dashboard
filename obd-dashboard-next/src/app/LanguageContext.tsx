@@ -24,17 +24,16 @@ const LanguageContext = createContext<LanguageContextValue>({
   },
 });
 
-export const LanguageProvider = ({ children }: PropsWithChildren) => {
-  const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
+const getInitialLocale = (): Locale => {
+  if (typeof window === "undefined") {
+    return DEFAULT_LOCALE;
+  }
+  const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  return stored === "fr" ? "fr" : "en";
+};
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    const storedLocale: Locale = stored === "fr" ? "fr" : "en";
-    if (storedLocale !== locale) {
-      setLocale(storedLocale);
-    }
-  }, []);
+export const LanguageProvider = ({ children }: PropsWithChildren) => {
+  const [locale, setLocale] = useState<Locale>(getInitialLocale);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
