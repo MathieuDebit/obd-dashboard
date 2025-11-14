@@ -1,106 +1,124 @@
-"use client"
+"use client";
 
-import { useSyncExternalStore } from "react"
-import { OBDServerResponse } from "@/types/commands"
+import { useSyncExternalStore } from "react";
+import { OBDServerResponse } from "@/types/commands";
 
-export type PidSample = { timestamp: number; value: number }
+export type PidSample = { timestamp: number; value: number };
 
 const DEFAULT_WINDOW_SECONDS = Number(
-  process.env.NEXT_PUBLIC_PID_HISTORY_WINDOW_SECONDS ?? "60"
-)
-const HISTORY_WINDOW_MS = DEFAULT_WINDOW_SECONDS * 1000
+  process.env.NEXT_PUBLIC_PID_HISTORY_WINDOW_SECONDS ?? "60",
+);
+const HISTORY_WINDOW_MS = DEFAULT_WINDOW_SECONDS * 1000;
+const DEFAULT_MAX_SAMPLES = Number(
+  process.env.NEXT_PUBLIC_PID_HISTORY_MAX_SAMPLES ?? "240",
+);
 
-const historyByPid = new Map<string, PidSample[]>()
-const listeners = new Set<() => void>()
+const historyByPid = new Map<string, PidSample[]>();
+const listeners = new Set<() => void>();
+let isRecording = true;
 
 const emit = () => {
-  listeners.forEach((listener) => listener())
-}
+  listeners.forEach((listener) => listener());
+};
 
 const subscribe = (listener: () => void) => {
-  listeners.add(listener)
-  return () => listeners.delete(listener)
-}
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
 
-const pruneHistory = (cutoff: number) => {
-  let changed = false
-  historyByPid.forEach((samples, pid) => {
-    const pruned = samples.filter((sample) => sample.timestamp >= cutoff)
-    if (pruned.length === samples.length) {
-      return
-    }
+const pruneSamples = (samples: PidSample[], cutoff: number) => {
+  let changed = false;
 
-    if (pruned.length > 0) {
-      historyByPid.set(pid, pruned)
-    } else {
-      historyByPid.delete(pid)
-    }
-    changed = true
-  })
-  return changed
-}
-
-export function recordPidSamples(response: OBDServerResponse) {
-  const entries = Object.entries(response.pids ?? {})
-  if (entries.length === 0) {
-    return
+  while (samples.length > 0 && samples[0]?.timestamp < cutoff) {
+    samples.shift();
+    changed = true;
   }
 
-  const cutoff = response.timestamp - HISTORY_WINDOW_MS
-  let updated = false
+  while (samples.length > DEFAULT_MAX_SAMPLES) {
+    samples.shift();
+    changed = true;
+  }
+
+  return changed;
+};
+
+export function recordPidSamples(response: OBDServerResponse) {
+  if (!isRecording) {
+    return;
+  }
+
+  const entries = Object.entries(response.pids ?? {});
+  if (entries.length === 0) {
+    return;
+  }
+
+  const cutoff = response.timestamp - HISTORY_WINDOW_MS;
+  let updated = false;
 
   entries.forEach(([pid, rawValue]) => {
     const numericValue =
       typeof rawValue === "number"
         ? rawValue
         : typeof rawValue === "string"
-        ? Number(rawValue)
-        : Number(rawValue ?? 0)
+          ? Number(rawValue)
+          : Number(rawValue ?? 0);
 
-    if (Number.isNaN(numericValue)) {
-      return
+    if (!Number.isFinite(numericValue)) {
+      return;
     }
 
-    const samples = historyByPid.get(pid) ?? []
-    const updatedSamples = [
-      ...samples,
-      { timestamp: response.timestamp, value: numericValue },
-    ].filter((sample) => sample.timestamp >= cutoff)
+    const samples = historyByPid.get(pid) ?? [];
+    samples.push({ timestamp: response.timestamp, value: numericValue });
+    const changed = pruneSamples(samples, cutoff);
 
-    historyByPid.set(pid, updatedSamples)
-    updated = true
-  })
+    if (samples.length === 0) {
+      historyByPid.delete(pid);
+    } else {
+      historyByPid.set(pid, samples);
+    }
 
-  const pruned = pruneHistory(cutoff)
+    updated = updated || changed || samples.length > 0;
+  });
 
-  if (updated || pruned) {
-    emit()
+  if (updated) {
+    emit();
   }
 }
 
-const EMPTY_SNAPSHOT: PidSample[] = []
+const EMPTY_SNAPSHOT: PidSample[] = [];
 
 const getSnapshotForPid = (pid: string | null) =>
-  pid ? historyByPid.get(pid) ?? EMPTY_SNAPSHOT : EMPTY_SNAPSHOT
+  pid ? historyByPid.get(pid) ?? EMPTY_SNAPSHOT : EMPTY_SNAPSHOT;
 
 export function usePidHistory(pid: string | null) {
   return useSyncExternalStore<PidSample[]>(
     subscribe,
     () => getSnapshotForPid(pid),
-    () => EMPTY_SNAPSHOT
-  )
+    () => EMPTY_SNAPSHOT,
+  );
 }
 
 export function getPidHistory(pid: string) {
-  return historyByPid.get(pid)?.slice() ?? []
+  return historyByPid.get(pid)?.slice() ?? [];
 }
 
 export function clearPidHistory() {
   if (historyByPid.size === 0) {
-    return
+    return;
   }
-  historyByPid.clear()
-  emit()
+  historyByPid.clear();
+  emit();
 }
 
-export const PID_HISTORY_WINDOW_SECONDS = DEFAULT_WINDOW_SECONDS
+export function pausePidHistory() {
+  if (!isRecording) return;
+  isRecording = false;
+}
+
+export function resumePidHistory() {
+  if (isRecording) return;
+  isRecording = true;
+}
+
+export const isPidHistoryRecording = () => isRecording;
+export const PID_HISTORY_WINDOW_SECONDS = DEFAULT_WINDOW_SECONDS;
