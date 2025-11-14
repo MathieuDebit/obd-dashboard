@@ -1,0 +1,263 @@
+{
+  "pids": {
+    "RPM": {
+      "name": "Engine RPM",
+      "description": "**Engine RPM**  \nMeasures crankshaft speed in revolutions per minute.\n\n**Why it matters**  \n- Monitor idle quality and avoid stalls  \n- Choose optimal shift points  \n- Protect the engine from premature wear\n\n**Heads-up**  \nVery low RPM causes stalls; excessive RPM risks over-revving."
+    },
+    "SPEED": {
+      "name": "Vehicle speed",
+      "description": "**Vehicle speed**  \nShows instantaneous road speed in km/h.\n\n**Why it matters**  \n- Adapt driving style precisely  \n- Stay within legal limits  \n- Match torque delivery to road speed\n\n**Heads-up**  \nZero or erratic readings usually indicate a faulty speed sensor."
+    },
+    "COOLANT_TEMP": {
+      "name": "Coolant temperature",
+      "description": "**Coolant temperature**  \nReports how hot the engine coolant is (°C).\n\n**Why it matters**  \n- Detect overheating above ~100 °C  \n- Confirm the thermostat works properly  \n- Optimize fuel use and emissions\n\n**Heads-up**  \nA coolant temp that never rises means the engine does not warm up correctly."
+    },
+    "INTAKE_TEMP": {
+      "name": "Intake air temperature",
+      "description": "**Intake air temperature**  \nIndicates the temperature of the air inside the manifold.\n\n**Why it matters**  \n- Calculate the air/fuel ratio  \n- Adjust ignition timing  \n- Maximize combustion efficiency\n\n**Heads-up**  \nDirty or failed sensors skew fuel metering."
+    },
+    "INTAKE_PRESSURE": {
+      "name": "Manifold pressure",
+      "description": "**Manifold pressure**  \nMeasures intake manifold pressure in kPa.\n\n**Why it matters**  \n- Evaluate actual engine load  \n- Supervise turbo or supercharger output  \n- Tune fuel injection\n\n**Heads-up**  \nUnusually low pressure often points to a leak or clog."
+    },
+    "BAROMETRIC_PRESSURE": {
+      "name": "Barometric pressure",
+      "description": "**Barometric pressure**  \nShows ambient atmospheric pressure in kPa.\n\n**Why it matters**  \n- Compensate fueling for altitude and weather  \n- Adjust ignition timing for density changes\n\n**Heads-up**  \nA faulty sensor drives the mixture excessively rich or lean."
+    },
+    "TIMING_ADVANCE": {
+      "name": "Ignition advance",
+      "description": "**Ignition advance**  \nExpressed in degrees before top dead center (BTDC).\n\n**Why it matters**  \n- Extract maximum power  \n- Reduce fuel consumption  \n- Prevent knock\n\n**Heads-up**  \nToo much advance causes pinging; too little wastes power."
+    },
+    "THROTTLE_POS": {
+      "name": "Throttle position",
+      "description": "**Throttle position (TPS)**  \nPercentage opening of the throttle plate.\n\n**Why it matters**  \n- Command engine load precisely  \n- Keep pedal response smooth\n\n**Heads-up**  \nA contaminated TPS makes acceleration jerky."
+    },
+    "THROTTLE_ACTUATOR": {
+      "name": "Throttle actuator",
+      "description": "**Throttle actuator command**  \nPercentage requested by the ECU on the drive-by-wire servo.\n\n**Why it matters**  \n- Verify requested vs actual opening  \n- Spot a sticking servo motor\n\n**Heads-up**  \nA persistent gap greater than ~10 % typically triggers limp mode."
+    },
+    "THROTTLE_POS_B": {
+      "name": "Throttle sensor B",
+      "description": "**Throttle sensor B**  \nSecondary sensor validating throttle position.\n\n**Why it matters**  \n- Provides safety redundancy  \n- Detects A/B disagreement\n\n**Heads-up**  \nMismatched readings produce a diagnostic trouble code."
+    },
+    "RELATIVE_THROTTLE_POS": {
+      "name": "Relative throttle",
+      "description": "**Relative throttle position**  \nComparison against an internal reference value.\n\n**Why it matters**  \n- Reveal calibration drift  \n- Detect gradual deposit build-up\n\n**Heads-up**  \nLarge offsets hurt fuel economy."
+    },
+    "ENGINE_LOAD": {
+      "name": "Engine load",
+      "description": "**Engine load**  \nPercent of available torque currently used.\n\n**Why it matters**  \n- Diagnose heavy towing or steep climbs  \n- Spot chronic lugging at low RPM\n\n**Heads-up**  \nAbnormal load often stems from intake restrictions or mechanical drag."
+    },
+    "ABSOLUTE_LOAD": {
+      "name": "Absolute load",
+      "description": "**Absolute load**  \nECU calculation derived from MAF/MAP and RPM.\n\n**Why it matters**  \n- Provides a stable, comparable metric  \n- Useful for comparing separate driving sessions\n\n**Heads-up**  \nOutliers usually point to faulty sensors."
+    },
+    "LONG_FUEL_TRIM_1": {
+      "name": "Long-term fuel trim (B1)",
+      "description": "**Long-term fuel trim (LTFT)**  \nSlow correction applied to bank 1 fueling.\n\n**Why it matters**  \n- Compensates persistent mixture errors  \n- Diagnoses vacuum leaks or clogged injectors\n\n**Heads-up**  \nValues beyond ±25 % require deeper inspection."
+    },
+    "SHORT_FUEL_TRIM_1": {
+      "name": "Short-term fuel trim (B1)",
+      "description": "**Short-term fuel trim (STFT)**  \nInstant reaction to lambda sensor feedback.\n\n**Why it matters**  \n- Tracks rapid mixture changes  \n- Keeps combustion efficient\n\n**Heads-up**  \nExcessive oscillations often mean an aging oxygen sensor."
+    },
+    "MAF": {
+      "name": "Mass air flow",
+      "description": "**Mass air flow (MAF)**  \nAir mass entering the engine in g/s.\n\n**Why it matters**  \n- Sets the injected fuel quantity  \n- Optimizes consumption\n\n**Heads-up**  \nA dirty MAF causes hesitation and misfires."
+    },
+    "EVAPORATIVE_PURGE": {
+      "name": "EVAP purge",
+      "description": "**EVAP purge command**  \nOpening percentage of the vapor purge valve.\n\n**Why it matters**  \n- Lowers evaporative emissions  \n- Keeps the EVAP circuit sealed\n\n**Heads-up**  \nA stuck valve typically logs a P044x code."
+    },
+    "COMMANDED_EGR": {
+      "name": "Commanded EGR",
+      "description": "**Commanded EGR**  \nRequested recirculation rate for exhaust gases.\n\n**Why it matters**  \n- Cuts NOₓ emissions  \n- Keeps combustion temperatures in check\n\n**Heads-up**  \nIf the valve cannot follow the command, the MIL lights up."
+    },
+    "CATALYST_TEMP_B1S1": {
+      "name": "Catalyst temp B1S1",
+      "description": "**Upstream catalyst temperature**  \nMeasured in °C before the catalytic converter.\n\n**Why it matters**  \n- Check catalyst health  \n- Avoid thermal damage\n\n**Heads-up**  \nTemperatures above ~900 °C can melt the substrate."
+    },
+    "CATALYST_TEMP_B1S2": {
+      "name": "Catalyst temp B1S2",
+      "description": "**Downstream catalyst temperature**  \nMeasured in °C after the converter.\n\n**Why it matters**  \n- Evaluate conversion efficiency  \n- Detect a clogged catalyst\n\n**Heads-up**  \nA low downstream temperature can indicate an ineffective catalyst."
+    },
+    "O2_S1_WR_VOLTAGE": {
+      "name": "Upstream O₂ voltage",
+      "description": "**Upstream wideband O₂ voltage**  \nSensor output in volts.\n\n**Why it matters**  \n- Enables precise air/fuel control  \n- Monitors sensor responsiveness\n\n**Heads-up**  \nUnstable voltage is a common sign of sensor aging."
+    },
+    "O2_S1_WR_CURRENT": {
+      "name": "Upstream O₂ current",
+      "description": "**Upstream O₂ pump current**  \nSensor pump/heater current in mA.\n\n**Why it matters**  \n- Validates heater operation  \n- Indicates sensor reactivity\n\n**Heads-up**  \nOut-of-range current usually means an electrical fault."
+    },
+    "O2_B1S2": {
+      "name": "Downstream O₂ voltage",
+      "description": "**Downstream O₂ voltage**  \nSensor reading after the catalyst.\n\n**Why it matters**  \n- Tracks catalyst efficiency  \n- Detects plugged converters\n\n**Heads-up**  \nReadings mirroring the upstream sensor reveal a failed catalyst."
+    },
+    "ELM_VOLTAGE": {
+      "name": "Interface voltage",
+      "description": "**OBD interface voltage (ELM327)**  \nSupply voltage powering the adapter.\n\n**Why it matters**  \n- Guarantees reliable OBD communication  \n- Checks adapter health\n\n**Heads-up**  \nLow voltage will drop the OBD link."
+    },
+    "CONTROL_MODULE_VOLTAGE": {
+      "name": "ECU voltage",
+      "description": "**ECU supply voltage**  \nMeasures the power rail feeding the control unit.\n\n**Why it matters**  \n- Prevents random resets  \n- Keeps ECU logic stable\n\n**Heads-up**  \nLarge fluctuations can damage the ECU."
+    },
+    "RUN_TIME": {
+      "name": "Engine run time",
+      "description": "**Engine run time**  \nSeconds elapsed since the last start.\n\n**Why it matters**  \n- Schedule maintenance intervals  \n- Confirm warm-up time before heavy load"
+    },
+    "RUN_TIME_MIL": {
+      "name": "Run time since MIL",
+      "description": "**Run time since MIL on**  \nSeconds elapsed since the MIL illuminated.\n\n**Why it matters**  \n- Track how long a fault stayed active  \n- Gauge its impact on drivability"
+    },
+    "DISTANCE_W_MIL": {
+      "name": "Distance with MIL",
+      "description": "**Distance since MIL on**  \nKilometers driven since the MIL lit up.\n\n**Why it matters**  \n- Measure how far you drove despite a fault  \n- Plan repairs accordingly"
+    },
+    "TIME_SINCE_DTC_CLEARED": {
+      "name": "Time since DTC clear",
+      "description": "**Time since clearing DTCs**  \nSeconds elapsed since diagnostic codes were reset.\n\n**Why it matters**  \n- Ensure the ECU had time to rerun all monitors"
+    },
+    "DISTANCE_SINCE_DTC_CLEAR": {
+      "name": "Distance since DTC clear",
+      "description": "**Distance since clearing DTCs**  \nKilometers driven since the codes were cleared.\n\n**Why it matters**  \n- Follow how self-diagnostics evolve over longer trips"
+    }
+  },
+  "ui": {
+    "chart.tooltip.time": "Time",
+    "commands.livePids.heading": "Live Vehicle PIDs",
+    "commands.correlations.heading": "Correlations",
+    "commands.correlations.pending": "Pending data",
+    "commands.chart.empty": "Select a PID or correlation to display the chart.",
+    "commands.modal.noDescription": "No description provided for this PID yet.",
+    "commands.modal.close": "Close description",
+    "commands.status.error": "failed to load",
+    "commands.status.loading": "loading...",
+    "commands.card.rpm_speed.title": "RPM vs Speed",
+    "commands.card.rpm_speed.description": "Visualize how engine revolutions relate to vehicle speed over the last minute.",
+    "commands.card.rpm_speed.primary": "Engine RPM",
+    "commands.card.rpm_speed.secondary": "Vehicle Speed",
+    "commands.card.throttle_load.title": "Throttle vs Engine Load",
+    "commands.card.throttle_load.description": "Compare driver throttle input with the engine load reported by the ECU.",
+    "commands.card.throttle_load.primary": "Throttle Position",
+    "commands.card.throttle_load.secondary": "Engine Load",
+    "commands.chart.infoButton": "Show description",
+    "core.heading": "Core telemetry",
+    "core.caption": "Showing curated emulator signals. Start the server with --emulator-all-pids to inspect every PID.",
+    "core.missing": "No data yet",
+    "settings.tab.general": "General",
+    "settings.tab.vehicle": "Vehicle",
+    "settings.tab.obd": "OBD",
+    "settings.tab.about": "About",
+    "settings.language.label": "Language",
+    "settings.language.fr": "French",
+    "settings.language.en": "English",
+    "settings.theme.label": "Theme",
+    "settings.theme.placeholder": "Select theme",
+    "settings.theme.light": "Light",
+    "settings.theme.dark": "Dark",
+    "settings.vehicle.model": "Model",
+    "settings.vehicle.color": "Color",
+    "settings.vehicle.brand.nissan": "Nissan",
+    "settings.vehicle.brand.toyota": "Toyota",
+    "settings.vehicle.model.nissan_r34": "Nissan Skyline R34 GT-R",
+    "settings.vehicle.model.nissan_200sx": "Nissan 200SX",
+    "settings.vehicle.model.toyota_supra": "Toyota Supra MK4",
+    "settings.vehicle.model.toyota_ae86": "Toyota AE86",
+    "settings.vehicle.color.red": "Red",
+    "settings.vehicle.color.green": "Green",
+    "settings.vehicle.color.blue": "Blue",
+    "settings.obd.restart.label": "Restart server",
+    "settings.obd.restart.button": "Restart",
+    "settings.about.version": "App version",
+    "settings.about.check": "Check for updates",
+    "settings.about.check.button": "Check",
+    "diagnostics.specs.heading": "Vehicle Specs",
+    "diagnostics.specs.subheading": "Renault Clio II Phase 2 1.4L 16V Extreme",
+    "diagnostics.specs.overview.title": "Overview",
+    "diagnostics.specs.overview.model.label": "Model",
+    "diagnostics.specs.overview.model.value": "Renault Clio II Phase 2 Extreme",
+    "diagnostics.specs.overview.body.label": "Body",
+    "diagnostics.specs.overview.body.value": "Hatchback · 3 doors",
+    "diagnostics.specs.overview.seats.label": "Seats",
+    "diagnostics.specs.overview.seats.value": "5 (2+3 layout)",
+    "diagnostics.specs.overview.production.label": "Production",
+    "diagnostics.specs.overview.production.value": "2001 – 2003",
+    "diagnostics.specs.powertrain.title": "Powertrain",
+    "diagnostics.specs.powertrain.engine.label": "Engine",
+    "diagnostics.specs.powertrain.engine.value": "1.4L inline-4 DOHC 16V (K4J)",
+    "diagnostics.specs.powertrain.displacement.label": "Displacement",
+    "diagnostics.specs.powertrain.displacement.value": "1390 cm³",
+    "diagnostics.specs.powertrain.aspiration.label": "Aspiration",
+    "diagnostics.specs.powertrain.aspiration.value": "Naturally aspirated",
+    "diagnostics.specs.powertrain.compression.label": "Compression",
+    "diagnostics.specs.powertrain.compression.value": "10:1",
+    "diagnostics.specs.powertrain.fuelSystem.label": "Fuel system",
+    "diagnostics.specs.powertrain.fuelSystem.value": "Multi-port indirect injection",
+    "diagnostics.specs.powertrain.layout.label": "Layout",
+    "diagnostics.specs.powertrain.layout.value": "Front transverse · FWD",
+    "diagnostics.specs.powertrain.transmission.label": "Transmission",
+    "diagnostics.specs.powertrain.transmission.value": "5-speed manual",
+    "diagnostics.specs.performance.title": "Performance",
+    "diagnostics.specs.performance.power.label": "Power",
+    "diagnostics.specs.performance.power.value": "98 hp @ 6000 rpm",
+    "diagnostics.specs.performance.torque.label": "Torque",
+    "diagnostics.specs.performance.torque.value": "127 Nm @ 3750 rpm",
+    "diagnostics.specs.performance.acceleration.label": "0-100 km/h",
+    "diagnostics.specs.performance.acceleration.value": "10.5 s",
+    "diagnostics.specs.performance.topSpeed.label": "Top speed",
+    "diagnostics.specs.performance.topSpeed.value": "185 km/h",
+    "diagnostics.specs.performance.weightToPower.label": "Weight-to-power",
+    "diagnostics.specs.performance.weightToPower.value": "10 kg/hp",
+    "diagnostics.specs.fuel.title": "Fuel & Emissions",
+    "diagnostics.specs.fuel.type.label": "Fuel type",
+    "diagnostics.specs.fuel.type.value": "Petrol (Euro 3)",
+    "diagnostics.specs.fuel.city.label": "City consumption",
+    "diagnostics.specs.fuel.city.value": "9.2 L/100 km",
+    "diagnostics.specs.fuel.highway.label": "Highway consumption",
+    "diagnostics.specs.fuel.highway.value": "5.3 L/100 km",
+    "diagnostics.specs.fuel.combined.label": "Combined consumption",
+    "diagnostics.specs.fuel.combined.value": "6.7 L/100 km",
+    "diagnostics.specs.fuel.co2.label": "CO₂ emissions",
+    "diagnostics.specs.fuel.co2.value": "160 g/km",
+    "diagnostics.specs.fuel.tank.label": "Fuel tank",
+    "diagnostics.specs.fuel.tank.value": "50 L",
+    "diagnostics.specs.fuel.range.label": "Typical range",
+    "diagnostics.specs.fuel.range.value": "≈746 km",
+    "diagnostics.specs.dimensions.title": "Dimensions & Weight",
+    "diagnostics.specs.dimensions.wheelbase.label": "Wheelbase",
+    "diagnostics.specs.dimensions.wheelbase.value": "247.2 cm",
+    "diagnostics.specs.dimensions.length.label": "Length",
+    "diagnostics.specs.dimensions.length.value": "381.2 cm",
+    "diagnostics.specs.dimensions.width.label": "Width",
+    "diagnostics.specs.dimensions.width.value": "163.9 cm",
+    "diagnostics.specs.dimensions.height.label": "Height",
+    "diagnostics.specs.dimensions.height.value": "141.7 cm",
+    "diagnostics.specs.dimensions.frontTrack.label": "Front track",
+    "diagnostics.specs.dimensions.frontTrack.value": "139.2 cm",
+    "diagnostics.specs.dimensions.rearTrack.label": "Rear track",
+    "diagnostics.specs.dimensions.rearTrack.value": "137.2 cm",
+    "diagnostics.specs.dimensions.curbWeight.label": "Curb weight",
+    "diagnostics.specs.dimensions.curbWeight.value": "980 kg",
+    "diagnostics.specs.dimensions.grossWeight.label": "Gross weight",
+    "diagnostics.specs.dimensions.grossWeight.value": "1525 kg",
+    "diagnostics.specs.cabin.title": "Cabin & Storage",
+    "diagnostics.specs.cabin.seatDistribution.label": "Seat distribution",
+    "diagnostics.specs.cabin.seatDistribution.value": "2 front · 3 rear",
+    "diagnostics.specs.cabin.boot.label": "Boot capacity",
+    "diagnostics.specs.cabin.boot.value": "255 L · 1037 L seats folded",
+    "diagnostics.specs.chassis.title": "Chassis & Steering",
+    "diagnostics.specs.chassis.frontBrakes.label": "Front brakes",
+    "diagnostics.specs.chassis.frontBrakes.value": "Vented discs",
+    "diagnostics.specs.chassis.rearBrakes.label": "Rear brakes",
+    "diagnostics.specs.chassis.rearBrakes.value": "Solid discs",
+    "diagnostics.specs.chassis.frontTyres.label": "Front tyres",
+    "diagnostics.specs.chassis.frontTyres.value": "185/55 R15",
+    "diagnostics.specs.chassis.rearTyres.label": "Rear tyres",
+    "diagnostics.specs.chassis.rearTyres.value": "185/55 R15",
+    "diagnostics.specs.chassis.steering.label": "Steering",
+    "diagnostics.specs.chassis.steering.value": "Rack and pinion",
+    "diagnostics.specs.chassis.frontSuspension.label": "Front suspension",
+    "diagnostics.specs.chassis.frontSuspension.value": "MacPherson struts with coil springs",
+    "diagnostics.specs.chassis.rearSuspension.label": "Rear suspension",
+    "diagnostics.specs.chassis.rearSuspension.value": "Torsion beam with coil springs"
+  }
+}
