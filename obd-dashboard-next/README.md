@@ -21,4 +21,4 @@ behaviour through the following optional environment variables:
 | `NEXT_PUBLIC_WS_RETRY_BASE_DELAY_MS` | Initial reconnect delay in milliseconds. | `1000` |
 | `NEXT_PUBLIC_WS_RETRY_MAX_DELAY_MS` | Upper bound for the exponential backoff delay. | `15000` |
 
-Everything happens client-side so the app stays offline-ready on the Pi.
+Everything happens client-side so the app stays offline-ready.
