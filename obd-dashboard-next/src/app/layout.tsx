@@ -3,6 +3,7 @@ import AppShell from "@/app/html";
 import "@/ui/css/globals.css";
 import { ThemeProvider, THEME_STORAGE_KEY } from "@/app/ThemeContext";
 import { LanguageProvider } from "@/app/LanguageContext";
+import { PowerModeProvider } from "@/app/PowerModeContext";
 import { geistMono, geistSans } from "@/ui/fonts";
 
 export const metadata: Metadata = {
@@ -31,9 +32,11 @@ export default function RootLayout({
       >
         <ThemeInitScript />
         <ThemeProvider>
-          <LanguageProvider>
-            <AppShell>{children}</AppShell>
-          </LanguageProvider>
+          <PowerModeProvider>
+            <LanguageProvider>
+              <AppShell>{children}</AppShell>
+            </LanguageProvider>
+          </PowerModeProvider>
         </ThemeProvider>
       </body>
     </html>

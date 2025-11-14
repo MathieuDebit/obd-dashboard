@@ -1,11 +1,20 @@
 'use client';
 
 import { Card, CardContent } from "@/ui/card";
-import CarScene from "./CarScene";
-import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { useMemo } from "react";
 import { ScrollArea } from "@/ui/scroll-area";
 import { useLanguage } from "@/app/LanguageContext";
 import { translateUi } from "@/utils/i18n";
+
+const CarScene = dynamic(() => import("./CarScene"), {
+  ssr: false,
+  loading: () => (
+    <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+      Loading 3D scene...
+    </div>
+  ),
+});
 
 type CarSpecDefinition = {
   titleKey: string;
