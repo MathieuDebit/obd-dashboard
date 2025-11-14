@@ -1,7 +1,9 @@
+export type RawPidValue = string | number | null | undefined;
+
 export type OBDServerResponse = {
   timestamp: number;
-  pids: Record<string, string>
-}
+  pids: Record<string, RawPidValue>;
+};
 
 export type Command = {
   pid: string,
