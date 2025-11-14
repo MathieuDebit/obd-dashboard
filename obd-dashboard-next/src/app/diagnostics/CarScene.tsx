@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useMemo, useEffect, useState } from 'react'
-import { Canvas, useFrame, useLoader } from '@react-three/fiber'
+import { useRef, useMemo, useEffect, useState, useCallback, Suspense } from 'react'
+import { Canvas, useFrame, useLoader, type RootState } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import { GLTFLoader } from 'three-stdlib'
 import { DRACOLoader } from 'three-stdlib'
@@ -18,6 +18,7 @@ import {
   Group,
 } from 'three'
 import Colorjs from 'colorjs.io';
+import { usePowerMode } from '@/app/PowerModeContext'
 
 interface CarProps {
   carBodyColor: string
@@ -110,6 +111,9 @@ const WHEEL_ROTATION_SPEED = 0.7;
 
 export default function CarScene() {
   const [background, setBackground] = useState('');
+  const [isTabVisible, setIsTabVisible] = useState(true);
+  const { mode } = usePowerMode();
+  const canvasElementRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const styles = getComputedStyle(document.documentElement);
@@ -117,30 +121,82 @@ export default function CarScene() {
     setBackground(bgColor);
   }, []);
 
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const handler = () => setIsTabVisible(document.visibilityState === 'visible');
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
+
+  const shouldAnimate = isTabVisible && mode !== 'powersave';
+
+  const handleContextLost = useCallback((event: Event) => {
+    event.preventDefault();
+  }, []);
+
+  const handleCanvasCreated = useCallback(({ gl }: RootState) => {
+    const element = gl.domElement;
+    canvasElementRef.current = element;
+    element.addEventListener('webglcontextlost', handleContextLost, false);
+
+    return () => {
+      element.removeEventListener('webglcontextlost', handleContextLost, false);
+      gl.forceContextLoss();
+      gl.dispose();
+    };
+  }, [handleContextLost]);
+
+  useEffect(() => {
+    const element = canvasElementRef.current;
+    return () => {
+      if (element) {
+        element.removeEventListener('webglcontextlost', handleContextLost, false);
+      }
+    };
+  }, [handleContextLost]);
+
   const carBodyColor = '#ff0000';
   const carDetailsColor = '#ffffff';
   const carGlassColor = '#ffffff';
+  const toneMappingExposure = mode === 'powersave' ? 0.7 : 0.85;
 
   return (
     <Canvas
       style={{ height: '100%', width: '100%', position: 'absolute', top: '0', left: '0' }}
       camera={{ position: [4.25, 1.4, -8.5], fov: 40 }}
-      gl={{ antialias: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 0.85 }}
+      frameloop={shouldAnimate ? 'always' : 'demand'}
+      dpr={mode === 'powersave' ? 1 : [1, 2]}
+      onCreated={handleCanvasCreated}
+      gl={{
+        antialias: mode !== 'powersave',
+        powerPreference: mode === 'powersave' ? 'low-power' : 'high-performance',
+        toneMapping: ACESFilmicToneMapping,
+        toneMappingExposure,
+      }}
     >
-      <color attach="background" args={[background]} />
-      <Environment files="/textures/equirectangular/venice_sunset_1k.hdr" />
-      <Car carBodyColor={carBodyColor} carDetailsColor={carDetailsColor} carGlassColor={carGlassColor} />
-      <OrbitControls
-        autoRotate
-        autoRotateSpeed={-2}
-        enableDamping
-        dampingFactor={0.05}
-        minDistance={3}
-        maxDistance={10}
-        minPolarAngle={Math.PI/6}  
-        maxPolarAngle={Math.PI/2}
-        target={[0, 0.5, 0]}
-      />
+      <Suspense fallback={null}>
+        <color attach="background" args={[background]} />
+        <Environment files="/textures/equirectangular/venice_sunset_1k.hdr" />
+        <Car
+          carBodyColor={carBodyColor}
+          carDetailsColor={carDetailsColor}
+          carGlassColor={carGlassColor}
+        />
+        <OrbitControls
+          autoRotate={shouldAnimate}
+          autoRotateSpeed={-2}
+          enableDamping
+          dampingFactor={0.05}
+          enableRotate={mode !== 'powersave'}
+          enablePan={mode !== 'powersave'}
+          enableZoom={mode !== 'powersave'}
+          minDistance={3}
+          maxDistance={10}
+          minPolarAngle={Math.PI/6}  
+          maxPolarAngle={Math.PI/2}
+          target={[0, 0.5, 0]}
+        />
+      </Suspense>
     </Canvas>
   )
 }

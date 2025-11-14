@@ -3,6 +3,7 @@
 import { useContext } from "react";
 import { Theme, ThemeContext } from "@/app/ThemeContext";
 import { useLanguage } from "@/app/LanguageContext";
+import { usePowerMode, type PowerMode } from "@/app/PowerModeContext";
 import type { Locale } from "@/utils/i18n";
 import { translateUi } from "@/utils/i18n";
 import { Card, CardContent } from "@/ui/card";
@@ -22,10 +23,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
 export default function Settings() {
     const { theme, changeTheme } = useContext(ThemeContext);
     const { locale, changeLocale } = useLanguage();
+    const { mode: powerMode, changeMode } = usePowerMode();
     const t = (key: string, fallback: string) => translateUi(key, locale, fallback);
 
     const onThemeChange = (newTheme: Theme) => {
         changeTheme(newTheme);
+    }
+
+    const onPowerModeChange = (newMode: PowerMode) => {
+        changeMode(newMode);
     }
 
     return (
@@ -63,6 +69,21 @@ export default function Settings() {
                                 <SelectContent>
                                     <SelectItem value="light">{t("settings.theme.light", "Light")}</SelectItem>
                                     <SelectItem value="dark">{t("settings.theme.dark", "Dark")}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </CardContent>
+
+                        <Separator />
+
+                        <CardContent className="flex justify-between">
+                            <div>{t("settings.power.label", "Power mode")}</div>
+                            <Select onValueChange={(value) => onPowerModeChange(value as PowerMode)} defaultValue={powerMode}>
+                                <SelectTrigger className="w-35">
+                                    <SelectValue placeholder={t("settings.power.placeholder", "Select mode")} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="performance">{t("settings.power.performance", "Performance")}</SelectItem>
+                                    <SelectItem value="powersave">{t("settings.power.save", "Power save")}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </CardContent>
