@@ -8,7 +8,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import type { Locale } from "@/utils/i18n";
+import { DEFAULT_LOCALE, type Locale } from "@/utils/i18n";
 
 export type LanguageContextValue = {
   locale: Locale;
@@ -24,14 +24,17 @@ const LanguageContext = createContext<LanguageContextValue>({
   },
 });
 
-const getInitialLocale = (): Locale => {
-  if (typeof window === "undefined") return "en";
-  const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-  return stored === "fr" ? "fr" : "en";
-};
-
 export const LanguageProvider = ({ children }: PropsWithChildren) => {
-  const [locale, setLocale] = useState<Locale>(getInitialLocale);
+  const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    const storedLocale: Locale = stored === "fr" ? "fr" : "en";
+    if (storedLocale !== locale) {
+      setLocale(storedLocale);
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

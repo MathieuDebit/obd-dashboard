@@ -18,6 +18,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/ui/card"
+import { useLanguage } from "@/app/LanguageContext"
+import { translateUi } from "@/utils/i18n"
 
 type AreaType = "basis" | "bump" | "linear" | "monotone" | "natural" | "step"
 
@@ -38,6 +40,8 @@ export interface ChartSeriesConfig {
   strokeWidth?: number
   fillOpacity?: number
   stackId?: string
+  yAxisId?: "left" | "right"
+  unit?: string
 }
 
 interface ChartAreaStepProps {
@@ -45,13 +49,16 @@ interface ChartAreaStepProps {
   description?: string
   chartData: { time: number; [key: string]: number }[]
   series?: ChartSeriesConfig[]
-  yLabel?: string
+  yAxisLeftUnit?: string
+  yAxisRightUnit?: string
   valueFormatter?: (value: number) => string
 }
 
-const defaultSeries: ChartSeriesConfig[] = [{ dataKey: "value", name: "Value" }]
+const defaultSeries: ChartSeriesConfig[] = [
+  { dataKey: "value", name: "Value", yAxisId: "left" },
+]
 
-const formatTickLabel = (value: number) => {
+const formatTimestamp = (value: number) => {
   if (typeof value !== "number" || Number.isNaN(value)) {
     return ""
   }
@@ -66,11 +73,43 @@ export function ChartAreaStep({
   description,
   chartData,
   series,
-  yLabel,
+  yAxisLeftUnit,
+  yAxisRightUnit,
   valueFormatter,
 }: ChartAreaStepProps) {
   const seriesToRender =
     series && series.length > 0 ? series : defaultSeries
+  const startTimestamp = chartData.length > 0 ? chartData[0].time : null
+  const usesRightAxis = seriesToRender.some(
+    (serie) => (serie.yAxisId ?? "left") === "right"
+  )
+  const hasUnitBadges = Boolean(yAxisLeftUnit || yAxisRightUnit)
+  const chartContainerClass = "h-full w-full"
+  const { locale } = useLanguage()
+  const tooltipTimeLabel = translateUi("chart.tooltip.time", locale, "Time")
+
+  const tickFormatter = (value: number) => {
+    if (
+      startTimestamp === null ||
+      typeof value !== "number" ||
+      Number.isNaN(value)
+    ) {
+      return ""
+    }
+    const elapsedSeconds = Math.floor((value - startTimestamp) / 1000)
+    if (elapsedSeconds < 0 || elapsedSeconds % 10 !== 0) {
+      return ""
+    }
+    return formatTimestamp(value)
+  }
+
+  const seriesConfigMap = seriesToRender.reduce<Record<string, ChartSeriesConfig>>(
+    (acc, serie) => {
+      acc[serie.dataKey] = serie
+      return acc
+    },
+    {}
+  )
 
   return (
     <Card className="h-full">
@@ -78,59 +117,92 @@ export function ChartAreaStep({
         {title && <CardTitle>{title}</CardTitle>}
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
-      <CardContent className="h-[340px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={chartData}
-            margin={{ top: 16, bottom: 8, left: 0, right: 16 }}
-          >
-            <CartesianGrid strokeDasharray="4 4" stroke="hsl(var(--muted-foreground) / 0.2)" />
-            <XAxis
-              dataKey="time"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={formatTickLabel}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              label={
-                yLabel
-                  ? {
-                      value: yLabel,
-                      angle: -90,
-                      position: "insideLeft",
-                      offset: -5,
-                      fill: "hsl(var(--muted-foreground))",
-                    }
-                  : undefined
+      <CardContent className="h-[360px] w-full">
+        {hasUnitBadges && (
+          <div className="mb-3 flex items-center justify-between text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
+            <span className="flex items-center gap-1">
+              {yAxisLeftUnit ? (
+                <span className="rounded-md border border-border/60 bg-muted px-2 py-0.5">
+                  {yAxisLeftUnit}
+                </span>
+              ) : (
+                <span className="text-muted-foreground/50"> </span>
+              )}
+            </span>
+            <span className="flex items-center gap-1">
+              {yAxisRightUnit ? (
+                <span className="rounded-md border border-border/60 bg-muted px-2 py-0.5">
+                  {yAxisRightUnit}
+                </span>
+              ) : (
+                <span className="text-muted-foreground/50"> </span>
+              )}
+            </span>
+          </div>
+        )}
+        <div className={chartContainerClass}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={chartData}
+              margin={{ top: 12, bottom: 8, left: 0, right: 16 }}
+            >
+              <CartesianGrid strokeDasharray="4 4" stroke="hsl(var(--muted-foreground) / 0.2)" />
+              <XAxis
+                dataKey="time"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={tickFormatter}
+              />
+              <YAxis
+                yAxisId="left"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
+              {usesRightAxis && (
+                <YAxis
+                  orientation="right"
+                  yAxisId="right"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+              )}
+            <Tooltip
+              content={
+                <ChartTooltip
+                  valueFormatter={valueFormatter}
+                  seriesConfig={seriesConfigMap}
+                  timeLabel={tooltipTimeLabel}
+                />
               }
             />
-            <Tooltip content={<ChartTooltip valueFormatter={valueFormatter} />} />
-            {seriesToRender.length > 1 && (
-              <Legend wrapperStyle={{ paddingTop: 8 }} />
-            )}
-            {seriesToRender.map((serie, index) => {
-              const stroke = serie.color || COLOR_PALETTE[index % COLOR_PALETTE.length]
-              return (
-                <Area
-                  key={serie.dataKey}
-                  type={serie.type ?? "monotone"}
-                  dataKey={serie.dataKey}
-                  name={serie.name}
-                  stroke={stroke}
-                  strokeWidth={serie.strokeWidth ?? 2}
-                  fill={stroke}
-                  fillOpacity={serie.fillOpacity ?? 0.2}
-                  stackId={serie.stackId}
-                  isAnimationActive={false}
-                />
-              )
-            })}
-          </AreaChart>
-        </ResponsiveContainer>
+              {seriesToRender.length > 1 && (
+                <Legend wrapperStyle={{ paddingTop: 8 }} />
+              )}
+              {seriesToRender.map((serie, index) => {
+                const stroke = serie.color || COLOR_PALETTE[index % COLOR_PALETTE.length]
+                const yAxisId = serie.yAxisId ?? "left"
+                return (
+                  <Area
+                    key={serie.dataKey}
+                    type={serie.type ?? "monotone"}
+                    dataKey={serie.dataKey}
+                    name={serie.name}
+                    yAxisId={yAxisId}
+                    stroke={stroke}
+                    strokeWidth={serie.strokeWidth ?? 2}
+                    fill={stroke}
+                    fillOpacity={serie.fillOpacity ?? 0.2}
+                    stackId={serie.stackId}
+                    isAnimationActive={false}
+                  />
+                )
+              })}
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   )
@@ -141,8 +213,12 @@ function ChartTooltip({
   payload,
   label,
   valueFormatter,
+  seriesConfig,
+  timeLabel,
 }: TooltipProps<number, string> & {
   valueFormatter?: (value: number) => string
+  seriesConfig?: Record<string, ChartSeriesConfig>
+  timeLabel?: string
 }) {
   if (!active || !payload?.length) {
     return null
@@ -156,13 +232,15 @@ function ChartTooltip({
       : NaN
   const formattedLabel = Number.isNaN(resolvedLabel)
     ? "--"
-    : formatTickLabel(resolvedLabel)
+    : formatTimestamp(resolvedLabel)
 
   return (
     <div className="rounded-md border border-border bg-background px-3 py-2 text-xs shadow-xl">
-      <p className="font-medium text-muted-foreground">
-        Time: <span className="text-foreground">{formattedLabel}</span>
-      </p>
+      {timeLabel && (
+        <p className="font-medium text-muted-foreground">
+          {timeLabel}: <span className="text-foreground">{formattedLabel}</span>
+        </p>
+      )}
       <div className="mt-2 space-y-1">
         {payload.map((item) => (
           <div
@@ -184,6 +262,11 @@ function ChartTooltip({
                   ? valueFormatter(item.value)
                   : item.value.toFixed(2)
                 : item.value}
+              {seriesConfig &&
+              typeof item.dataKey === "string" &&
+              seriesConfig[item.dataKey]?.unit
+                ? ` ${seriesConfig[item.dataKey]?.unit}`
+                : ""}
             </span>
           </div>
         ))}
