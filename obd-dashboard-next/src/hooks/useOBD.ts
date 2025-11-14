@@ -4,7 +4,12 @@ import { Command, Commands, OBDServerResponse } from "@/types/commands";
 import { isCorePid, toPidKey } from "@/constants/pids";
 import { getPidCopy } from "@/utils/i18n";
 import { useLanguage } from "@/app/LanguageContext";
-import { recordPidSamples } from "@/store/pidHistory";
+import {
+  recordPidSamples,
+  clearPidHistory,
+  pausePidHistory,
+  resumePidHistory,
+} from "@/store/pidHistory";
 import { appConfig } from "@/config/app";
 
 type ConnectionStatus = "idle" | "connecting" | "ready" | "error";
@@ -68,6 +73,7 @@ export default function useOBD() {
   const [parseError, setParseError] = useState<Error | null>(null);
   const [lastValidResponse, setLastValidResponse] =
     useState<OBDServerResponse>(DEFAULT_RESPONSE);
+  const [isRecordingHistory, setIsRecordingHistory] = useState(false);
   const { locale } = useLanguage();
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
@@ -157,17 +163,24 @@ export default function useOBD() {
         retryCount = 0;
         setStatus("ready");
         setConnectionError(null);
+        resumePidHistory();
+        setIsRecordingHistory(true);
       };
 
       const handleError = () => {
         if (disposed) return;
         setConnectionError(new Error("[useOBD] WebSocket connection error"));
         setStatus("error");
+        pausePidHistory();
+        setIsRecordingHistory(false);
       };
 
       const handleClose = () => {
         if (disposed) return;
         setStatus("error");
+        pausePidHistory();
+        clearPidHistory();
+        setIsRecordingHistory(false);
         scheduleReconnect();
       };
 
@@ -259,5 +272,6 @@ export default function useOBD() {
     error: combinedError,
     status,
     isLoading,
+    isRecordingHistory,
   };
 }
