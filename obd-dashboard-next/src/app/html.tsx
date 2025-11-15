@@ -1,9 +1,10 @@
 'use client';
 
-import { PropsWithChildren } from "react";
-import { ScrollArea } from "@/ui/scroll-area";
-import Nav from "@/ui/nav";
+import type { PropsWithChildren } from "react";
+
 import PerformanceProfiler from "@/components/dev/PerformanceProfiler";
+import Nav from "@/ui/nav";
+import { ScrollArea } from "@/ui/scroll-area";
 
 export default function AppShell({ children }: PropsWithChildren) {
   return (

@@ -2,14 +2,15 @@
 
 import {
   Profiler,
-  ProfilerOnRenderCallback,
-  PropsWithChildren,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import type { PropsWithChildren ,
+  ProfilerOnRenderCallback} from "react";
+
 import { useDevtoolsPreferences } from "@/app/DevtoolsPreferencesContext";
 
 type CommitStats = {
@@ -90,16 +91,16 @@ const PerformanceOverlay = ({
   );
 
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex min-w-[200px] flex-col gap-1 rounded-md border border-foreground/10 bg-background/80 px-3 py-2 text-xs font-medium shadow-lg backdrop-blur">
-      <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+    <div className="border-foreground/10 bg-background/80 pointer-events-none fixed bottom-4 right-4 z-50 flex min-w-[200px] flex-col gap-1 rounded-md border px-3 py-2 text-xs font-medium shadow-lg backdrop-blur">
+      <span className="text-muted-foreground text-[10px] uppercase tracking-wide">
         Dev Performance
       </span>
-      <div className="flex flex-wrap gap-3 font-mono text-[11px] text-foreground">
+      <div className="text-foreground flex flex-wrap gap-3 font-mono text-[11px]">
         <span>FPS {fps ? fps.toFixed(0) : "--"}</span>
         <span>Commit {stats.average ? stats.average.toFixed(1) : "--"}ms</span>
         <span>CPU ~{Number.isFinite(cpuLoad) ? cpuLoad : 0}%</span>
       </div>
-      <p className="text-[10px] text-muted-foreground">
+      <p className="text-muted-foreground text-[10px]">
         Target &lt;30% CPU while idle.
       </p>
     </div>
@@ -129,14 +130,14 @@ export default function PerformanceProfiler({
     );
   }, [fps, stats, showPerformanceOverlay]);
 
+  const overlay = useMemo(() => {
+    if (!isDev || !showPerformanceOverlay) return null;
+    return <PerformanceOverlay fps={fps} stats={stats} />;
+  }, [fps, stats, showPerformanceOverlay]);
+
   if (!isDev) {
     return <>{children}</>;
   }
-
-  const overlay = useMemo(() => {
-    if (!showPerformanceOverlay) return null;
-    return <PerformanceOverlay fps={fps} stats={stats} />;
-  }, [fps, stats, showPerformanceOverlay]);
 
   return (
     <>

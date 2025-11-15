@@ -2,12 +2,12 @@
 
 import {
   createContext,
-  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
+import type { PropsWithChildren } from "react";
 
 export type PowerMode = "performance" | "powersave";
 
@@ -25,16 +25,14 @@ const PowerModeContext = createContext<PowerModeContextValue>({
   },
 });
 
-export const PowerModeProvider = ({ children }: PropsWithChildren) => {
-  const [mode, setMode] = useState<PowerMode>("performance");
+const getStoredPowerMode = (): PowerMode => {
+  if (typeof window === "undefined") return "performance";
+  const stored = window.localStorage.getItem(POWER_MODE_STORAGE_KEY);
+  return stored === "powersave" ? "powersave" : "performance";
+};
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(POWER_MODE_STORAGE_KEY);
-    if (stored === "powersave" || stored === "performance") {
-      setMode((current) => (current === stored ? current : stored));
-    }
-  }, []);
+export const PowerModeProvider = ({ children }: PropsWithChildren) => {
+  const [mode, setMode] = useState<PowerMode>(() => getStoredPowerMode());
 
   useEffect(() => {
     if (typeof window === "undefined") return;

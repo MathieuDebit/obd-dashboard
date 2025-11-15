@@ -1,12 +1,13 @@
 'use client';
 
 import { useContext } from "react";
-import { Theme, ThemeContext } from "@/app/ThemeContext";
+
+import { useDevtoolsPreferences } from "@/app/DevtoolsPreferencesContext";
 import { useLanguage } from "@/app/LanguageContext";
 import { usePowerMode, type PowerMode } from "@/app/PowerModeContext";
-import { useDevtoolsPreferences } from "@/app/DevtoolsPreferencesContext";
-import type { Locale } from "@/utils/i18n";
-import { translateUi } from "@/utils/i18n";
+import { ThemeContext } from "@/app/ThemeContext";
+import type { Theme} from "@/app/ThemeContext";
+import { Button } from "@/ui/button";
 import { Card, CardContent } from "@/ui/card";
 import {
   Select,
@@ -17,9 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/select";
-import { Button } from "@/ui/button";
 import { Separator } from "@/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
+import type { Locale } from "@/utils/i18n";
+import { translateUi } from "@/utils/i18n";
 
 export default function Settings() {
     const { theme, changeTheme } = useContext(ThemeContext);
@@ -39,7 +41,7 @@ export default function Settings() {
     return (
         <div>
             <Tabs defaultValue="general" className="w-full">
-                <TabsList className="w-full h-13 mb-5">
+                <TabsList className="h-13 mb-5 w-full">
                     <TabsTrigger value="general">{t("settings.tab.general", "General")}</TabsTrigger>
                     <TabsTrigger value="vehicle">{t("settings.tab.vehicle", "Vehicle")}</TabsTrigger>
                     <TabsTrigger value="obd">{t("settings.tab.obd", "OBD")}</TabsTrigger>
@@ -90,7 +92,7 @@ export default function Settings() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-muted-foreground text-xs">
                                 {t(
                                     "settings.power.refresh_hint",
                                     "Chart refresh rate is automatically slowed down in Power save mode to match the OBD sample interval."
@@ -133,7 +135,7 @@ export default function Settings() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-muted-foreground text-xs">
                                 {t(
                                     "settings.devtools.overlay.description",
                                     "Show the FPS/CPU overlay when debugging performance in development builds."

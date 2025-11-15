@@ -1,5 +1,6 @@
-import { THEMES } from "@/ui/css/utils"
-import { ComponentType, ReactNode } from "react"
+import type { ComponentType, ReactNode } from "react"
+
+import type { THEMES } from "@/ui/css/utils"
 
 export type ChartData = {
   speed: number

@@ -1,7 +1,8 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { OBDServerResponse } from "@/types/commands";
+
+import type { OBDServerResponse } from "@/types/commands";
 
 export type PidSample = { timestamp: number; value: number };
 

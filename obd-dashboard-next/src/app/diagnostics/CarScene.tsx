@@ -1,10 +1,22 @@
 'use client';
 
-import { useRef, useMemo, useEffect, useState, useCallback, Suspense } from 'react'
-import { Canvas, useFrame, useLoader, type RootState } from '@react-three/fiber'
-import { OrbitControls, Environment } from '@react-three/drei'
-import { GLTFLoader } from 'three-stdlib'
-import { DRACOLoader } from 'three-stdlib'
+import { OrbitControls, Environment } from "@react-three/drei";
+import {
+  Canvas,
+  useFrame,
+  useLoader,
+  type RootState,
+} from "@react-three/fiber";
+import Colorjs from "colorjs.io";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import type { Group } from "three";
 import {
   ACESFilmicToneMapping,
   Color,
@@ -15,10 +27,10 @@ import {
   MultiplyBlending,
   PlaneGeometry,
   TextureLoader,
-  Group,
-} from 'three'
-import Colorjs from 'colorjs.io';
-import { usePowerMode } from '@/app/PowerModeContext'
+} from "three";
+import { DRACOLoader, GLTFLoader } from "three-stdlib";
+
+import { usePowerMode } from "@/app/PowerModeContext";
 
 interface CarProps {
   carBodyColor: string

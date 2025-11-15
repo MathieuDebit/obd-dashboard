@@ -1,14 +1,16 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
-import useOBD from "@/hooks/useOBD";
-import { ScrollArea } from "@/ui/scroll-area";
-import { Markdown } from "@/components/Markdown";
-import { ChartAreaStep, ChartSeriesConfig } from "@/components/ChartAreaStep";
 import { Info, X } from "lucide-react";
-import { usePidHistory } from "@/store/pidHistory";
-import { toPidKey } from "@/constants/pids";
+import { useEffect, useMemo, useState } from "react";
+
 import { useLanguage } from "@/app/LanguageContext";
+import { ChartAreaStep } from "@/components/ChartAreaStep";
+import type { ChartSeriesConfig } from "@/components/ChartAreaStep";
+import { Markdown } from "@/components/Markdown";
+import { toPidKey } from "@/constants/pids";
+import useOBD from "@/hooks/useOBD";
+import { usePidHistory } from "@/store/pidHistory";
+import { ScrollArea } from "@/ui/scroll-area";
 import { translateUi } from "@/utils/i18n";
 
 type CorrelationCardDefinition = {
@@ -270,15 +272,15 @@ export default function CommandsPage() {
     }
 
     return (
-        <div className="absolute w-full h-full top-0 left-0 p-3">
-            <div className="flex flex-col h-full gap-4">
-                <ScrollArea className="w-full h-1/2">
+        <div className="absolute left-0 top-0 h-full w-full p-3">
+            <div className="flex h-full flex-col gap-4">
+                <ScrollArea className="h-1/2 w-full">
                     <div className="space-y-4">
                         <div>
-                            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                            <p className="text-muted-foreground mb-2 text-xs uppercase tracking-wide">
                                 {livePidHeading}
                             </p>
-                            <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
                                 {pids.map(({ pid, name, value }) => {
                                     const isActive = pid === currentTab && !selectedCorrelation;
                                     return (
@@ -287,11 +289,11 @@ export default function CommandsPage() {
                                             type="button"
                                             aria-pressed={isActive}
                                             onClick={() => onPidSelect(pid)}
-                                            className={`w-full rounded-md border p-3 text-left transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                                            className={`hover:border-primary focus-visible:ring-primary/50 w-full rounded-md border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 ${
                                                 isActive ? "border-primary bg-primary/5" : "border-muted"
                                             }`}
                                         >
-                                            <div className="text-xs uppercase tracking-wide text-muted-foreground">{name}</div>
+                                            <div className="text-muted-foreground text-xs uppercase tracking-wide">{name}</div>
                                             <div className="text-2xl font-semibold">{value ?? "--"}</div>
                                         </button>
                                     );
@@ -300,10 +302,10 @@ export default function CommandsPage() {
                         </div>
 
                         <div>
-                            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                            <p className="text-muted-foreground mb-2 text-xs uppercase tracking-wide">
                                 {correlationsHeading}
                             </p>
-                            <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                                 {correlationCards.map((card) => {
                                     const primaryKey = toPidKey(card.primaryPid);
                                     const secondaryKey = toPidKey(card.secondaryPid);
@@ -317,19 +319,19 @@ export default function CommandsPage() {
                                             type="button"
                                             aria-pressed={isActive}
                                             onClick={() => onCorrelationSelect(card.id)}
-                                            className={`w-full rounded-md border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                                            className={`focus-visible:ring-primary/50 w-full rounded-md border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 ${
                                                 isActive ? "border-primary bg-primary/5" : "border-muted"
                                             } ${!hasLiveData ? "opacity-75" : "hover:border-primary"}`}
                                         >
                                             <div className="flex items-center gap-2 text-sm font-semibold">
                                                 {card.title}
                                                 {!hasLiveData && (
-                                                    <span className="text-[10px] font-normal uppercase tracking-wide text-muted-foreground">
+                                                    <span className="text-muted-foreground text-[10px] font-normal uppercase tracking-wide">
                                                         {pendingDataLabel}
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="mt-1 text-xs text-muted-foreground">
+                                            <p className="text-muted-foreground mt-1 text-xs">
                                                 {primaryName} ↔ {secondaryName}
                                             </p>
                                         </button>
@@ -348,7 +350,7 @@ export default function CommandsPage() {
                                     type="button"
                                     aria-label={`${infoButtonLabel} - ${selectedPid.name}`}
                                     onClick={() => setInfoPid(selectedPid.pid)}
-                                    className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-md border border-muted bg-background/80 text-muted-foreground transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                                    className="border-muted bg-background/80 text-muted-foreground hover:text-primary focus-visible:ring-primary/50 absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md border transition focus-visible:outline-none focus-visible:ring-2"
                                 >
                                     <Info className="h-4 w-4" aria-hidden="true" />
                                 </button>
@@ -363,7 +365,7 @@ export default function CommandsPage() {
                             />
                         </div>
                     ) : (
-                        <div className="h-full flex items-center justify-center text-muted-foreground">
+                        <div className="text-muted-foreground flex h-full items-center justify-center">
                             {emptyChartLabel}
                         </div>
                     )}
@@ -375,19 +377,19 @@ export default function CommandsPage() {
                     onClick={() => setInfoPid(null)}
                 >
                     <div
-                        className="relative w-full max-w-lg rounded-lg border border-muted bg-background p-6 shadow-xl"
+                        className="border-muted bg-background relative w-full max-w-lg rounded-lg border p-6 shadow-xl"
                         onClick={(event) => event.stopPropagation()}
                     >
                         <button
                             type="button"
                             aria-label={closeDescriptionLabel}
                             onClick={() => setInfoPid(null)}
-                            className="absolute top-3 right-3 rounded-full p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                            className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/50 absolute right-3 top-3 rounded-full p-1 focus-visible:outline-none focus-visible:ring-2"
                         >
                             <X className="h-4 w-4" aria-hidden="true" />
                         </button>
                         <h2 className="text-lg font-semibold">{infoPidData.name}</h2>
-                        <p className="text-sm text-muted-foreground">{infoPidData.pid}</p>
+                        <p className="text-muted-foreground text-sm">{infoPidData.pid}</p>
                         <ScrollArea className="mt-4 max-h-64">
                             <Markdown content={infoPidData.description || noDescriptionLabel} />
                         </ScrollArea>

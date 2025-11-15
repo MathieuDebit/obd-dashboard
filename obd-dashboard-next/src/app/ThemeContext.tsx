@@ -2,11 +2,11 @@
 
 import {
   createContext,
-  PropsWithChildren,
   useCallback,
   useEffect,
   useState,
 } from "react";
+import type { PropsWithChildren } from "react";
 
 export type Theme = "light" | "dark";
 

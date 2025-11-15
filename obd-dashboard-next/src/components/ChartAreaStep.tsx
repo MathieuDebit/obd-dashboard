@@ -1,5 +1,7 @@
 "use client"
 
+import type {
+  TooltipProps} from "recharts";
 import {
   Area,
   AreaChart,
@@ -7,10 +9,11 @@ import {
   Legend,
   ResponsiveContainer,
   Tooltip,
-  TooltipProps,
   XAxis,
   YAxis,
 } from "recharts"
+
+import { useLanguage } from "@/app/LanguageContext"
 import {
   Card,
   CardContent,
@@ -18,7 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/ui/card"
-import { useLanguage } from "@/app/LanguageContext"
 import { translateUi } from "@/utils/i18n"
 
 type AreaType = "basis" | "bump" | "linear" | "monotone" | "natural" | "step"
@@ -119,10 +121,10 @@ export function ChartAreaStep({
       </CardHeader>
       <CardContent className="h-[360px] w-full">
         {hasUnitBadges && (
-          <div className="mb-3 flex items-center justify-between text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
+          <div className="text-muted-foreground mb-3 flex items-center justify-between text-[0.65rem] font-medium uppercase tracking-wide">
             <span className="flex items-center gap-1">
               {yAxisLeftUnit ? (
-                <span className="rounded-md border border-border/60 bg-muted px-2 py-0.5">
+                <span className="border-border/60 bg-muted rounded-md border px-2 py-0.5">
                   {yAxisLeftUnit}
                 </span>
               ) : (
@@ -131,7 +133,7 @@ export function ChartAreaStep({
             </span>
             <span className="flex items-center gap-1">
               {yAxisRightUnit ? (
-                <span className="rounded-md border border-border/60 bg-muted px-2 py-0.5">
+                <span className="border-border/60 bg-muted rounded-md border px-2 py-0.5">
                   {yAxisRightUnit}
                 </span>
               ) : (
@@ -235,9 +237,9 @@ function ChartTooltip({
     : formatTimestamp(resolvedLabel)
 
   return (
-    <div className="rounded-md border border-border bg-background px-3 py-2 text-xs shadow-xl">
+    <div className="border-border bg-background rounded-md border px-3 py-2 text-xs shadow-xl">
       {timeLabel && (
-        <p className="font-medium text-muted-foreground">
+        <p className="text-muted-foreground font-medium">
           {timeLabel}: <span className="text-foreground">{formattedLabel}</span>
         </p>
       )}
@@ -247,7 +249,7 @@ function ChartTooltip({
             key={item.dataKey}
             className="flex items-center justify-between gap-6"
           >
-            <span className="flex items-center gap-2 text-muted-foreground">
+            <span className="text-muted-foreground flex items-center gap-2">
               <span
                 className="inline-block h-2 w-2 rounded-sm"
                 style={{
@@ -256,7 +258,7 @@ function ChartTooltip({
               />
               {item.name ?? item.dataKey}
             </span>
-            <span className="font-semibold text-foreground">
+            <span className="text-foreground font-semibold">
               {typeof item.value === "number"
                 ? valueFormatter
                   ? valueFormatter(item.value)

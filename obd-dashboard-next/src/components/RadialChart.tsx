@@ -6,9 +6,10 @@ import {
   RadialBar,
   RadialBarChart,
 } from "recharts";
-import { cn } from "@/utils/classNames"
+
+import type { ChartConfig, ChartData } from "@/types/chart";
 import { ChartContainer } from "@/ui/chart"
-import { ChartConfig, ChartData } from "@/types/chart";
+import { cn } from "@/utils/classNames"
 
 
 interface RadialChartProps {

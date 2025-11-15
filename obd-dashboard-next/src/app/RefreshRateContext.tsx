@@ -1,11 +1,8 @@
 'use client';
 
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useMemo,
-} from "react";
+import { createContext, useContext, useMemo } from "react";
+import type { PropsWithChildren } from "react";
+
 import { usePowerMode, type PowerMode } from "@/app/PowerModeContext";
 
 type RefreshRateContextValue = {

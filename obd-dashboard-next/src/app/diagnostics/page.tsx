@@ -1,16 +1,17 @@
 'use client';
 
-import { Card, CardContent } from "@/ui/card";
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
-import { ScrollArea } from "@/ui/scroll-area";
+import { useCallback, useMemo } from "react";
+
 import { useLanguage } from "@/app/LanguageContext";
+import { Card, CardContent } from "@/ui/card";
+import { ScrollArea } from "@/ui/scroll-area";
 import { translateUi } from "@/utils/i18n";
 
 const CarScene = dynamic(() => import("./CarScene"), {
   ssr: false,
   loading: () => (
-    <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+    <div className="text-muted-foreground absolute inset-0 flex items-center justify-center text-sm">
       Loading 3D scene...
     </div>
   ),
@@ -316,7 +317,10 @@ const CAR_SPEC_DEFINITIONS: CarSpecDefinition[] = [
 export default function Page() {
   const { locale } = useLanguage();
 
-  const t = (key: string, fallback: string) => translateUi(key, locale, fallback);
+  const t = useCallback(
+    (key: string, fallback: string) => translateUi(key, locale, fallback),
+    [locale],
+  );
 
   const specCategories = useMemo(
     () =>
@@ -327,7 +331,7 @@ export default function Page() {
           value: t(spec.valueKey, spec.valueFallback),
         })),
       })),
-    [locale],
+    [t],
   );
 
   const vehicleSpecsHeading = t("diagnostics.specs.heading", "Vehicle Specs");
@@ -340,23 +344,23 @@ export default function Page() {
     <div>
       <CarScene />
 
-      <div className="absolute bottom-0 left-0 z-10 w-full h-1/2 p-5">
-        <Card className="h-full w-full bg-background/95 backdrop-blur pointer-events-auto">
+      <div className="absolute bottom-0 left-0 z-10 h-1/2 w-full p-5">
+        <Card className="bg-background/95 pointer-events-auto h-full w-full backdrop-blur">
           <CardContent className="flex h-full min-h-0 flex-col gap-4 p-5">
             <div className="shrink-0">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              <p className="text-muted-foreground text-xs uppercase tracking-wide">
                 {vehicleSpecsHeading}
               </p>
               <p className="text-lg font-semibold">{vehicleSpecsSubheading}</p>
             </div>
-            <ScrollArea className="w-full flex-1 min-h-0">
+            <ScrollArea className="min-h-0 w-full flex-1">
               <div className="grid gap-4 pr-3 sm:grid-cols-2 lg:grid-cols-3">
                 {specCategories.map((category) => (
                   <div
                     key={category.title}
-                    className="rounded-lg border bg-card/80 p-4 shadow-sm"
+                    className="bg-card/80 rounded-lg border p-4 shadow-sm"
                   >
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                       {category.title}
                     </p>
                     <dl className="mt-3 space-y-2">
