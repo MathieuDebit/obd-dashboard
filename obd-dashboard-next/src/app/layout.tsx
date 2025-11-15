@@ -4,6 +4,8 @@ import "@/ui/css/globals.css";
 import { ThemeProvider, THEME_STORAGE_KEY } from "@/app/ThemeContext";
 import { LanguageProvider } from "@/app/LanguageContext";
 import { PowerModeProvider } from "@/app/PowerModeContext";
+import { RefreshRateProvider } from "@/app/RefreshRateContext";
+import { DevtoolsPreferencesProvider } from "@/app/DevtoolsPreferencesContext";
 import { geistMono, geistSans } from "@/ui/fonts";
 
 export const metadata: Metadata = {
@@ -33,9 +35,13 @@ export default function RootLayout({
         <ThemeInitScript />
         <ThemeProvider>
           <PowerModeProvider>
-            <LanguageProvider>
-              <AppShell>{children}</AppShell>
-            </LanguageProvider>
+            <RefreshRateProvider>
+              <LanguageProvider>
+                <DevtoolsPreferencesProvider>
+                  <AppShell>{children}</AppShell>
+                </DevtoolsPreferencesProvider>
+              </LanguageProvider>
+            </RefreshRateProvider>
           </PowerModeProvider>
         </ThemeProvider>
       </body>
