@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Implements the Diagnostics page which displays a 3D vehicle scene and
+ * a localized specification panel pulled from static definitions.
+ */
+
 import dynamic from "next/dynamic";
 import { useCallback, useMemo } from "react";
 
@@ -314,6 +319,12 @@ const CAR_SPEC_DEFINITIONS: CarSpecDefinition[] = [
 ];
 
 
+/**
+ * Page renders the diagnostics scene and accompanying vehicle specification
+ * cards, translating every label according to the active locale.
+ *
+ * @returns The diagnostics page layout.
+ */
 export default function Page() {
   const { locale } = useLanguage();
 

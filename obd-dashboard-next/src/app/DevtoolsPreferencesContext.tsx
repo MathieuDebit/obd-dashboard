@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Hosts the context that persists developer tooling preferences such as
+ * toggling the performance overlay in the dashboard UI.
+ */
+
 import {
   createContext,
   useCallback,
@@ -27,6 +32,13 @@ const DevtoolsPreferencesContext =
     },
   });
 
+/**
+ * DevtoolsPreferencesProvider stores debug preferences in local storage and
+ * surfaces them via context so instrumentation can be toggled globally.
+ *
+ * @param props.children - Components requiring access to devtools preferences.
+ * @returns The provider-wrapped subtree.
+ */
 export const DevtoolsPreferencesProvider = ({
   children,
 }: PropsWithChildren) => {
@@ -61,5 +73,10 @@ export const DevtoolsPreferencesProvider = ({
   );
 };
 
+/**
+ * useDevtoolsPreferences exposes the developer preference state and setter.
+ *
+ * @returns The context value governing devtools options.
+ */
 export const useDevtoolsPreferences = () =>
   useContext(DevtoolsPreferencesContext);

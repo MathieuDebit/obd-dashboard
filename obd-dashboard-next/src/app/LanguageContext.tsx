@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Implements the language selection context that synchronizes the chosen
+ * locale across the dashboard, persists it, and updates the HTML lang attribute.
+ */
+
 import {
   createContext,
   useCallback,
@@ -25,12 +30,25 @@ const LanguageContext = createContext<LanguageContextValue>({
   },
 });
 
+/**
+ * Retrieves the persisted locale value, defaulting to English when running on
+ * the server or when no preference is stored.
+ *
+ * @returns The locale code to initialize the context with.
+ */
 const getStoredLocale = (): Locale => {
   if (typeof window === "undefined") return DEFAULT_LOCALE;
   const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
   return stored === "fr" ? "fr" : "en";
 };
 
+/**
+ * LanguageProvider exposes the active locale and setter so pages and hooks can
+ * render translated text consistently.
+ *
+ * @param props.children - Subtree that needs access to language controls.
+ * @returns The provider composed around the supplied children.
+ */
 export const LanguageProvider = ({ children }: PropsWithChildren) => {
   const [locale, setLocale] = useState<Locale>(() => getStoredLocale());
 
@@ -51,4 +69,9 @@ export const LanguageProvider = ({ children }: PropsWithChildren) => {
   );
 };
 
+/**
+ * useLanguage is a convenience hook for accessing the language context.
+ *
+ * @returns The active locale plus the change handler.
+ */
 export const useLanguage = () => useContext(LanguageContext);

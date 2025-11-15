@@ -1,6 +1,11 @@
 // @ts-nocheck
 "use client";
 
+/**
+ * @file Declares the Leaflet-based MapRoute component that renders a themed map
+ * under the dashboard using dynamic imports.
+ */
+
 import dynamic from "next/dynamic";
 import { useContext } from "react";
 
@@ -21,6 +26,12 @@ const TileLayer = dynamic(
 );
 
 
+/**
+ * MapRoute renders the Leaflet map and syncs the tile style with the current
+ * theme to keep the base map consistent with the UI.
+ *
+ * @returns Map container markup.
+ */
 export default function MapRoute() {
   const { theme } = useContext(ThemeContext);
 

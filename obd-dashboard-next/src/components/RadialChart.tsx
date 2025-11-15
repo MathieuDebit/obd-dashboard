@@ -1,6 +1,11 @@
 // @ts-nocheck
 "use client"
 
+/**
+ * @file Declares the RadialChart component that formats speed and RPM samples
+ * into the stylized radial gauge used in the telemetry card.
+ */
+
 // @ts-ignore - Recharts type definitions depend on redux state helpers we omit
 import {
   Label,
@@ -20,6 +25,16 @@ interface RadialChartProps {
   chartConfig: ChartConfig,
 }
 
+/**
+ * RadialChart renders a radial bar chart with a prominent speed readout and
+ * angle derived from the most recent RPM value.
+ *
+ * @param props.className - Optional class names appended to the container.
+ * @param props.chartData - Data array containing the latest telemetry sample.
+ * @param props.chartConfig - Chart configuration for context-specific styling.
+ * @returns A radial bar chart component; falls back to an empty placeholder if
+ * no data is available.
+ */
 export default function RadialChart({ className, chartData, chartConfig }: RadialChartProps) {
   if (chartData.length === 0) {
     return <div className={cn("aspect-square h-[150px]", className)} />

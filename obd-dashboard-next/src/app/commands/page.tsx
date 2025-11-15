@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Renders the Commands page where users can inspect live PID values, see
+ * correlations between related signals, and drill into detailed descriptions.
+ */
+
 import { Info, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -69,6 +74,16 @@ const CORRELATION_CARD_DEFINITIONS: CorrelationCardDefinition[] = [
     },
 ];
 
+/**
+ * Merges two PID history arrays into a single series keyed by timestamp to
+ * enable multi-axis charting of correlated signals.
+ *
+ * @param primary - History samples for the primary PID.
+ * @param secondary - History samples for the secondary PID.
+ * @param primaryKey - Property name assigned to primary PID values.
+ * @param secondaryKey - Property name assigned to secondary PID values.
+ * @returns An array of merged data points sorted by timestamp.
+ */
 const mergeCorrelationData = (
     primary: { timestamp: number; value: number }[],
     secondary: { timestamp: number; value: number }[],
@@ -91,6 +106,12 @@ const mergeCorrelationData = (
     return Array.from(points.values()).sort((a, b) => a.time - b.time);
 };
 
+/**
+ * Attempts to infer the unit label from a PID's value string (e.g. "32 km/h").
+ *
+ * @param value - Raw PID value potentially containing measurement units.
+ * @returns The extracted unit string when present.
+ */
 const extractUnitFromValue = (value?: string | number | null) => {
     if (typeof value !== "string") return undefined;
     const trimmed = value.trim();
@@ -100,6 +121,12 @@ const extractUnitFromValue = (value?: string | number | null) => {
     return unit.length > 0 ? unit : undefined;
 };
 
+/**
+ * CommandsPage renders the interactive PID selector, the correlation cards, as
+ * well as the chart/detail surfaces that visualize the selected data source.
+ *
+ * @returns The full Commands page layout.
+ */
 export default function CommandsPage() {
     const [currentTab, setCurrentTab] = useState<string | null>(null);
     const [infoPid, setInfoPid] = useState<string | null>(null);

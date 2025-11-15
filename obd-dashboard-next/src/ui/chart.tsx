@@ -1,4 +1,7 @@
 // @ts-nocheck
+/**
+ * @file Shared charting utilities and wrappers for Recharts components.
+ */
 import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import { createContext, useContext, useId, useMemo } from "react";
 // @ts-ignore - Recharts types pull in redux typings we intentionally exclude
@@ -15,6 +18,11 @@ type ChartContextProps = {
 
 const ChartContext = createContext<ChartContextProps | null>(null)
 
+/**
+ * Hook for accessing the chart context configuration.
+ *
+ * @returns Chart context value.
+ */
 function useChart() {
   const context = useContext(ChartContext)
 
@@ -25,6 +33,14 @@ function useChart() {
   return context
 }
 
+/**
+ * ChartContainer scopes chart-specific CSS variables and wraps the Recharts
+ * ResponsiveContainer with shared styling.
+ *
+ * @param props.config - Chart configuration map used for styling labels/colors.
+ * @param props.children - Chart elements rendered inside the responsive shell.
+ * @returns A styled div containing the chart canvas.
+ */
 function ChartContainer({
   id,
   className,
@@ -60,6 +76,13 @@ function ChartContainer({
   )
 }
 
+/**
+ * Injects CSS variables for each chart series based on the current theme.
+ *
+ * @param props.id - DOM id tied to the chart container.
+ * @param props.config - Chart configuration map.
+ * @returns A style element or null when no theme colors are defined.
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -125,6 +148,11 @@ type ChartTooltipContentProps = ComponentProps<"div"> & {
   labelKey?: string;
 };
 
+/**
+ * ChartTooltipContent renders a themed tooltip with flexible indicator styles.
+ *
+ * @returns Tooltip markup tailored to the current payload.
+ */
 function ChartTooltipContent({
   active,
   payload,
@@ -288,6 +316,11 @@ type ChartLegendContentProps = ComponentProps<"div"> & {
   nameKey?: string;
 };
 
+/**
+ * ChartLegendContent renders a simple flex legend driven by chart config.
+ *
+ * @returns Legend markup or null when no payload is provided.
+ */
 function ChartLegendContent({
   className,
   hideIcon = false,
@@ -338,7 +371,14 @@ function ChartLegendContent({
   )
 }
 
-// Helper to extract item config from a payload.
+/**
+ * Extracts the correct series configuration entry based on payload metadata.
+ *
+ * @param config - Chart configuration map.
+ * @param payload - Tooltip or legend datum.
+ * @param key - Key used to resolve the config entry.
+ * @returns Matching config entry if found.
+ */
 function getPayloadConfigFromPayload(
   config: ChartConfig,
   payload: unknown,
