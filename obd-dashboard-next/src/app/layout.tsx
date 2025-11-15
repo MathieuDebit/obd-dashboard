@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import AppShell from "@/app/html";
+
 import "@/ui/css/globals.css";
-import { ThemeProvider, THEME_STORAGE_KEY } from "@/app/ThemeContext";
+
+import { DevtoolsPreferencesProvider } from "@/app/DevtoolsPreferencesContext";
+import AppShell from "@/app/html";
 import { LanguageProvider } from "@/app/LanguageContext";
 import { PowerModeProvider } from "@/app/PowerModeContext";
 import { RefreshRateProvider } from "@/app/RefreshRateContext";
-import { DevtoolsPreferencesProvider } from "@/app/DevtoolsPreferencesContext";
+import { ThemeProvider, THEME_STORAGE_KEY } from "@/app/ThemeContext";
 import { geistMono, geistSans } from "@/ui/fonts";
 
 export const metadata: Metadata = {
@@ -30,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-muted`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-muted antialiased`}
       >
         <ThemeInitScript />
         <ThemeProvider>

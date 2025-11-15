@@ -1,17 +1,34 @@
-import { render, screen } from '@testing-library/react'
-import Settings from '@/app/settings/page'
-import { ThemeProvider } from '@/app/ThemeContext'
- 
-describe('Settings', () => {
-  it('renders the settings tabs and controls', () => {
-    render(
+import { render, screen } from "@testing-library/react";
+
+import { DevtoolsPreferencesProvider } from "@/app/DevtoolsPreferencesContext";
+import { LanguageProvider } from "@/app/LanguageContext";
+import { PowerModeProvider } from "@/app/PowerModeContext";
+import Settings from "@/app/settings/page";
+import { ThemeProvider } from "@/app/ThemeContext";
+
+const renderWithProviders = () =>
+  render(
+    <LanguageProvider>
       <ThemeProvider>
-        <Settings />
+        <PowerModeProvider>
+          <DevtoolsPreferencesProvider>
+            <Settings />
+          </DevtoolsPreferencesProvider>
+        </PowerModeProvider>
       </ThemeProvider>
-    )
- 
-    expect(screen.getByRole('tab', { name: /General/i })).toBeInTheDocument()
-    expect(screen.getByText('Language')).toBeInTheDocument()
-    expect(screen.getByText('Theme')).toBeInTheDocument()
-  })
-})
+    </LanguageProvider>,
+  );
+
+describe("Settings", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  it("renders the settings tabs and controls", () => {
+    renderWithProviders();
+
+    expect(screen.getByRole("tab", { name: /General/i })).toBeInTheDocument();
+    expect(screen.getByText("Language")).toBeInTheDocument();
+    expect(screen.getByText("Theme")).toBeInTheDocument();
+  });
+});

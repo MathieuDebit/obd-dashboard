@@ -2,13 +2,13 @@
 
 import {
   createContext,
-  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
+import type { PropsWithChildren } from "react";
 
 type DevtoolsPreferencesContextValue = {
   showPerformanceOverlay: boolean;
@@ -30,15 +30,12 @@ const DevtoolsPreferencesContext =
 export const DevtoolsPreferencesProvider = ({
   children,
 }: PropsWithChildren) => {
-  const [showPerformanceOverlay, setShowPerformanceOverlay] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "true") {
-      setShowPerformanceOverlay(true);
-    }
-  }, []);
+  const [showPerformanceOverlay, setShowPerformanceOverlay] = useState<boolean>(
+    () => {
+      if (typeof window === "undefined") return false;
+      return window.localStorage.getItem(STORAGE_KEY) === "true";
+    },
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;

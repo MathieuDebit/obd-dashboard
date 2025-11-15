@@ -4,11 +4,11 @@ import Link from "next/link";
 
 export default function Nav() {
     return (
-        <div className="flex h-15 mb-2">
-            <Link className="bg-background border rounded-lg flex justify-center items-center flex-1 h-full" href="/"><Navigation /></Link>
-            <Link className="bg-background border rounded-lg flex justify-center items-center flex-1 h-full mx-2" href="/commands"><ChartLine /></Link>
-            <Link className="bg-background border rounded-lg flex justify-center items-center flex-1 h-full mr-2" href="/diagnostics"><Wrench /></Link>
-            <Link className="bg-background border rounded-lg flex justify-center items-center flex-none aspect-square" href="/settings"><Settings /></Link>
+        <div className="h-15 mb-2 flex">
+            <Link className="bg-background flex h-full flex-1 items-center justify-center rounded-lg border" href="/"><Navigation /></Link>
+            <Link className="bg-background mx-2 flex h-full flex-1 items-center justify-center rounded-lg border" href="/commands"><ChartLine /></Link>
+            <Link className="bg-background mr-2 flex h-full flex-1 items-center justify-center rounded-lg border" href="/diagnostics"><Wrench /></Link>
+            <Link className="bg-background flex aspect-square flex-none items-center justify-center rounded-lg border" href="/settings"><Settings /></Link>
         </div>
     )
 }

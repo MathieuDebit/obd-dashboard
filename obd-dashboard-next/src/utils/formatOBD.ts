@@ -8,7 +8,7 @@ type ObdCommandMeta = {
 
 type ObdCommands = Record<string, ObdCommandMeta>;
 
-const formatCommandsValue: FormatCommandsValue = {
+const formatCommandsValue = {
     pct   : v => `${Number(v).toFixed(1)} %`,
     rpm   : v => `${Number(v).toFixed(0)} tr/min`,
     kmh   : v => `${Number(v).toFixed(0)} km/h`,
@@ -24,19 +24,22 @@ const formatCommandsValue: FormatCommandsValue = {
     raw   : v => v,
     str   : v => `${v}`,
     byteA : v => v,
-};
+} satisfies FormatCommandsValue;
+
+const getFormatter = <K extends keyof typeof formatCommandsValue>(key: K) =>
+  formatCommandsValue[key];
 
 export const OBD_COMMANDS: ObdCommands = {
   RPM: {
-    formatValue: formatCommandsValue.rpm,
+    formatValue: getFormatter("rpm"),
   },
 
   SPEED: {
-    formatValue: formatCommandsValue.kmh,
+    formatValue: getFormatter("kmh"),
   },
 
   COOLANT_TEMP: {
-    formatValue: formatCommandsValue.tempC,
+    formatValue: getFormatter("tempC"),
   },
 
   INTAKE_TEMP: {
@@ -44,7 +47,7 @@ export const OBD_COMMANDS: ObdCommands = {
   },
 
   INTAKE_PRESSURE: {
-    formatValue: formatCommandsValue.kPa,
+    formatValue: getFormatter("kPa"),
   },
 
   BAROMETRIC_PRESSURE: {
@@ -52,11 +55,11 @@ export const OBD_COMMANDS: ObdCommands = {
   },
 
   TIMING_ADVANCE: {
-    formatValue: formatCommandsValue.BTDC,
+    formatValue: getFormatter("BTDC"),
   },
 
   THROTTLE_POS: {
-    formatValue: formatCommandsValue.pct,
+    formatValue: getFormatter("pct"),
   },
 
   THROTTLE_ACTUATOR: {
@@ -88,7 +91,7 @@ export const OBD_COMMANDS: ObdCommands = {
   },
 
   MAF: {
-    formatValue: formatCommandsValue.g_s,
+    formatValue: getFormatter("g_s"),
   },
 
   EVAPORATIVE_PURGE: {
@@ -108,11 +111,11 @@ export const OBD_COMMANDS: ObdCommands = {
   },
 
   O2_S1_WR_VOLTAGE: {
-    formatValue: formatCommandsValue.volt,
+    formatValue: getFormatter("volt"),
   },
 
   O2_S1_WR_CURRENT: {
-    formatValue: formatCommandsValue.mA,
+    formatValue: getFormatter("mA"),
   },
 
   O2_B1S2: {
@@ -128,7 +131,7 @@ export const OBD_COMMANDS: ObdCommands = {
   },
 
   RUN_TIME: {
-    formatValue: formatCommandsValue.sec,
+    formatValue: getFormatter("sec"),
   },
 
   RUN_TIME_MIL: {
@@ -136,15 +139,15 @@ export const OBD_COMMANDS: ObdCommands = {
   },
 
   DISTANCE_W_MIL: {
-    formatValue: formatCommandsValue.dist,
+    formatValue: getFormatter("dist"),
   },
 
   TIME_SINCE_DTC_CLEARED: {
-    formatValue: formatCommandsValue.sec,
+    formatValue: getFormatter("sec"),
   },
 
   DISTANCE_SINCE_DTC_CLEAR: {
-    formatValue: formatCommandsValue.dist,
+    formatValue: getFormatter("dist"),
   },
 
     /*
@@ -169,4 +172,3 @@ export const OBD_COMMANDS: ObdCommands = {
     STATUS:                         { formatValue: formatCommandsValue.str },
     */
 };
-

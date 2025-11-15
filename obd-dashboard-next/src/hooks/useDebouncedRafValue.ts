@@ -10,12 +10,12 @@ const hasWindow = () => typeof window !== "undefined";
 export function useDebouncedRafValue<T>(value: T, delayMs: number) {
   const [state, setState] = useState(value);
   const frameRef = useRef<number | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
       if (frameRef.current && hasWindow()) {
@@ -31,8 +31,8 @@ export function useDebouncedRafValue<T>(value: T, delayMs: number) {
       return;
     }
 
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
     if (frameRef.current) {
@@ -48,8 +48,8 @@ export function useDebouncedRafValue<T>(value: T, delayMs: number) {
     }, delayMs);
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
       if (frameRef.current) {

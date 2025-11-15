@@ -1,12 +1,13 @@
 'use client';
 
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
-import useOBD from "@/hooks/useOBD";
-import GPSCarData from "@/components/GPSCarData";
-import { ChartConfig, ChartData } from "@/types/chart";
-import Map from "@/components/Map";
+
 import { useRefreshRate } from "@/app/RefreshRateContext";
+import GPSCarData from "@/components/GPSCarData";
+import Map from "@/components/Map";
 import { useDebouncedRafValue } from "@/hooks/useDebouncedRafValue";
+import useOBD from "@/hooks/useOBD";
+import type { ChartConfig, ChartData } from "@/types/chart";
 
 const chartConfig = {} satisfies ChartConfig;
 const FALLBACK_CHART_FILL = "var(--foreground)";
@@ -63,7 +64,7 @@ export default function Home() {
     <div>
       <Map />
 
-      <div className="absolute w-full bottom-0 left-0 mb-5 pointer-events-none flex justify-center">
+      <div className="pointer-events-none absolute bottom-0 left-0 mb-5 flex w-full justify-center">
         <div className="w-100 pointer-events-auto">
           <GPSCarData chartData={chartData} chartConfig={chartConfig} />
         </div>

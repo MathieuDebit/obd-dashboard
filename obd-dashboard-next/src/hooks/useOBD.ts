@@ -1,16 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { OBD_COMMANDS } from "@/utils/formatOBD";
-import { Command, Commands, OBDServerResponse } from "@/types/commands";
-import { isCorePid, toPidKey } from "@/constants/pids";
-import { getPidCopy } from "@/utils/i18n";
+
 import { useLanguage } from "@/app/LanguageContext";
+import { appConfig } from "@/config/app";
+import { isCorePid, toPidKey } from "@/constants/pids";
 import {
   recordPidSamples,
   clearPidHistory,
   pausePidHistory,
   resumePidHistory,
 } from "@/store/pidHistory";
-import { appConfig } from "@/config/app";
+import type {
+  Command,
+  Commands,
+  OBDServerResponse,
+  RawPidValue,
+} from "@/types/commands";
+import { OBD_COMMANDS } from "@/utils/formatOBD";
+import { getPidCopy } from "@/utils/i18n";
 
 type ConnectionStatus = "idle" | "connecting" | "ready" | "error";
 
@@ -54,7 +60,7 @@ const normalizeResponse = (
 };
 
 const extractNumericPidSamples = (
-  pids: Record<string, string | number>,
+  pids: Record<string, RawPidValue>,
 ): Record<string, number> =>
   Object.entries(pids).reduce<Record<string, number>>((acc, [pid, value]) => {
     const numeric =
