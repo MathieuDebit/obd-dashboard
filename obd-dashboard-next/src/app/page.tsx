@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import useOBD from "@/hooks/useOBD";
 import GPSCarData from "@/components/GPSCarData";
 import { ChartConfig, ChartData } from "@/types/chart";
 import Map from "@/components/Map";
+import { useRefreshRate } from "@/app/RefreshRateContext";
+import { useDebouncedRafValue } from "@/hooks/useDebouncedRafValue";
 
 const chartConfig = {} satisfies ChartConfig;
 const FALLBACK_CHART_FILL = "var(--foreground)";
@@ -12,6 +14,8 @@ const FALLBACK_CHART_FILL = "var(--foreground)";
 export default function Home() {
   const { pidMap, error, isLoading } = useOBD();
   const [chartFill, setChartFill] = useState(FALLBACK_CHART_FILL);
+  const deferredPidMap = useDeferredValue(pidMap);
+  const { intervalMs: refreshIntervalMs } = useRefreshRate();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -24,7 +28,7 @@ export default function Home() {
 
   const telemetry = useMemo(() => {
     const getNumericPid = (pid: string) => {
-      const command = pidMap.get(pid);
+      const command = deferredPidMap.get(pid);
       if (!command) return null;
       const parsed = Number(command.rawValue);
       return Number.isFinite(parsed) ? parsed : null;
@@ -34,9 +38,9 @@ export default function Home() {
       speed: getNumericPid("SPEED"),
       rpm: getNumericPid("RPM"),
     };
-  }, [pidMap]);
+  }, [deferredPidMap]);
 
-  const chartData: ChartData = useMemo(() => {
+  const latestChartData: ChartData = useMemo(() => {
     if (telemetry.speed == null && telemetry.rpm == null) {
       return [];
     }
@@ -49,6 +53,8 @@ export default function Home() {
       },
     ];
   }, [telemetry, chartFill]);
+
+  const chartData = useDebouncedRafValue(latestChartData, refreshIntervalMs);
 
   if (error) return <div>failed to load</div>;
   if (isLoading) return <div>loading...</div>;

@@ -4,6 +4,7 @@ import { useContext } from "react";
 import { Theme, ThemeContext } from "@/app/ThemeContext";
 import { useLanguage } from "@/app/LanguageContext";
 import { usePowerMode, type PowerMode } from "@/app/PowerModeContext";
+import { useDevtoolsPreferences } from "@/app/DevtoolsPreferencesContext";
 import type { Locale } from "@/utils/i18n";
 import { translateUi } from "@/utils/i18n";
 import { Card, CardContent } from "@/ui/card";
@@ -24,6 +25,7 @@ export default function Settings() {
     const { theme, changeTheme } = useContext(ThemeContext);
     const { locale, changeLocale } = useLanguage();
     const { mode: powerMode, changeMode } = usePowerMode();
+    const { showPerformanceOverlay, setShowPerformanceOverlay } = useDevtoolsPreferences();
     const t = (key: string, fallback: string) => translateUi(key, locale, fallback);
 
     const onThemeChange = (newTheme: Theme) => {
@@ -75,17 +77,68 @@ export default function Settings() {
 
                         <Separator />
 
-                        <CardContent className="flex justify-between">
-                            <div>{t("settings.power.label", "Power mode")}</div>
-                            <Select onValueChange={(value) => onPowerModeChange(value as PowerMode)} defaultValue={powerMode}>
-                                <SelectTrigger className="w-35">
-                                    <SelectValue placeholder={t("settings.power.placeholder", "Select mode")} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="performance">{t("settings.power.performance", "Performance")}</SelectItem>
-                                    <SelectItem value="powersave">{t("settings.power.save", "Power save")}</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        <CardContent className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                                <div>{t("settings.power.label", "Power mode")}</div>
+                                <Select onValueChange={(value) => onPowerModeChange(value as PowerMode)} defaultValue={powerMode}>
+                                    <SelectTrigger className="w-35">
+                                        <SelectValue placeholder={t("settings.power.placeholder", "Select mode")} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="performance">{t("settings.power.performance", "Performance")}</SelectItem>
+                                        <SelectItem value="powersave">{t("settings.power.save", "Power save")}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                {t(
+                                    "settings.power.refresh_hint",
+                                    "Chart refresh rate is automatically slowed down in Power save mode to match the OBD sample interval."
+                                )}
+                            </p>
+                        </CardContent>
+
+                        <Separator />
+
+                        <CardContent className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                                <div>{t("settings.devtools.overlay.label", "Performance overlay")}</div>
+                                <Select
+                                    value={showPerformanceOverlay ? "visible" : "hidden"}
+                                    onValueChange={(value) =>
+                                        setShowPerformanceOverlay(value === "visible")
+                                    }
+                                >
+                                    <SelectTrigger className="w-45">
+                                        <SelectValue
+                                            placeholder={t(
+                                                "settings.devtools.overlay.placeholder",
+                                                "Select behavior"
+                                            )}
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="hidden">
+                                            {t(
+                                                "settings.devtools.overlay.hidden",
+                                                "Hidden (default)"
+                                            )}
+                                        </SelectItem>
+                                        <SelectItem value="visible">
+                                            {t(
+                                                "settings.devtools.overlay.visible",
+                                                "Visible"
+                                            )}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                {t(
+                                    "settings.devtools.overlay.description",
+                                    "Show the FPS/CPU overlay when debugging performance in development builds."
+                                )}
+                            </p>
                         </CardContent>
                     </Card>
                 </TabsContent>
