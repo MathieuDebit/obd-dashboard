@@ -22,6 +22,16 @@ const SAMPLE_WINDOW = 24;
 const FRAME_BUDGET_MS = 16.67;
 const isDev = process.env.NODE_ENV !== "production";
 
+const useIsClient = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  return isClient;
+};
+
 const useFpsMeter = () => {
   const [fps, setFps] = useState(0);
 
@@ -110,12 +120,13 @@ const PerformanceOverlay = ({
 export default function PerformanceProfiler({
   children,
 }: PropsWithChildren) {
+  const isClient = useIsClient();
   const fps = useFpsMeter();
   const { stats, onRender } = useCommitStats();
   const { showPerformanceOverlay } = useDevtoolsPreferences();
 
   useEffect(() => {
-    if (!isDev || !showPerformanceOverlay) return;
+    if (!isDev || !showPerformanceOverlay || !isClient) return;
     if (!stats.average) return;
     const cpuLoad = Math.min(
       100,
@@ -131,11 +142,11 @@ export default function PerformanceProfiler({
   }, [fps, stats, showPerformanceOverlay]);
 
   const overlay = useMemo(() => {
-    if (!isDev || !showPerformanceOverlay) return null;
+    if (!isDev || !showPerformanceOverlay || !isClient) return null;
     return <PerformanceOverlay fps={fps} stats={stats} />;
-  }, [fps, stats, showPerformanceOverlay]);
+  }, [fps, stats, showPerformanceOverlay, isClient]);
 
-  if (!isDev) {
+  if (!isDev || !isClient) {
     return <>{children}</>;
   }
 
