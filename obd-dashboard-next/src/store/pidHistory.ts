@@ -30,7 +30,11 @@ const subscribe = (listener: () => void) => {
 const pruneSamples = (samples: PidSample[], cutoff: number) => {
   let changed = false;
 
-  while (samples.length > 0 && samples[0]?.timestamp < cutoff) {
+  while (samples.length > 0) {
+    const first = samples[0];
+    if (!first || first.timestamp >= cutoff) {
+      break;
+    }
     samples.shift();
     changed = true;
   }

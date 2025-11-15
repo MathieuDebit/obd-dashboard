@@ -9,7 +9,12 @@ import {
   pausePidHistory,
   resumePidHistory,
 } from "@/store/pidHistory";
-import type { Command, Commands, OBDServerResponse } from "@/types/commands";
+import type {
+  Command,
+  Commands,
+  OBDServerResponse,
+  RawPidValue,
+} from "@/types/commands";
 import { OBD_COMMANDS } from "@/utils/formatOBD";
 import { getPidCopy } from "@/utils/i18n";
 
@@ -55,7 +60,7 @@ const normalizeResponse = (
 };
 
 const extractNumericPidSamples = (
-  pids: Record<string, string | number>,
+  pids: Record<string, RawPidValue>,
 ): Record<string, number> =>
   Object.entries(pids).reduce<Record<string, number>>((acc, [pid, value]) => {
     const numeric =

@@ -140,8 +140,12 @@ export default function CommandsPage() {
     const correlationSecondaryHistory = usePidHistory(selectedCorrelation ? selectedCorrelation.secondaryPid : null);
 
     useEffect(() => {
-        if (!currentTab && pids.length > 0 && !selectedCorrelationId) {
-            setCurrentTab(pids[0].pid);
+        if (currentTab || selectedCorrelationId || pids.length === 0) {
+            return;
+        }
+        const firstPid = pids[0];
+        if (firstPid) {
+            setCurrentTab(firstPid.pid);
         }
     }, [pids, currentTab, selectedCorrelationId]);
 
