@@ -1,5 +1,9 @@
 "use client"
 
+/**
+ * @file Generic data table wrapper built on TanStack Table + shadcn styles.
+ */
+
 import type {
   ColumnDef} from "@tanstack/react-table";
 import {
@@ -22,6 +26,13 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
 }
 
+/**
+ * DataTable renders tabular data from column definitions using TanStack Table.
+ *
+ * @param props.columns - Column definitions describing headers/cells.
+ * @param props.data - Array of row data objects.
+ * @returns The rendered table with fallback empty state.
+ */
 export function DataTable<TData, TValue>({
   columns,
   data,

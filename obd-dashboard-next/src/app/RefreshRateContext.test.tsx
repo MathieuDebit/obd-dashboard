@@ -1,3 +1,7 @@
+/**
+ * @file Tests ensuring the RefreshRateContext exposes the correct polling
+ * interval for each supported power mode.
+ */
 import { renderHook } from "@testing-library/react";
 
 import {
@@ -15,6 +19,13 @@ jest.mock("@/app/PowerModeContext", () => ({
 
 const mockUsePowerMode = usePowerMode as jest.MockedFunction<typeof usePowerMode>;
 
+/**
+ * Helper that renders the RefreshRateProvider with a mocked power mode to
+ * capture the interval returned by the hook.
+ *
+ * @param mode - Power profile to be emulated.
+ * @returns The renderHook result for assertions.
+ */
 const renderRefreshRate = (mode: PowerMode) => {
   mockUsePowerMode.mockReturnValue({
     mode,

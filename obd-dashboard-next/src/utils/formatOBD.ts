@@ -1,3 +1,6 @@
+/**
+ * @file Formatting helpers for OBD command raw values.
+ */
 type FormatValue = (v: string) => string;
 
 type FormatCommandsValue = Record<string, FormatValue>;
@@ -8,6 +11,9 @@ type ObdCommandMeta = {
 
 type ObdCommands = Record<string, ObdCommandMeta>;
 
+/**
+ * Lookup table of formatters that append human-readable units.
+ */
 const formatCommandsValue = {
     pct   : v => `${Number(v).toFixed(1)} %`,
     rpm   : v => `${Number(v).toFixed(0)} tr/min`,
@@ -26,9 +32,18 @@ const formatCommandsValue = {
     byteA : v => v,
 } satisfies FormatCommandsValue;
 
+/**
+ * Safely returns a formatter function from the lookup table for reuse.
+ *
+ * @param key - Identifier of the formatter to use.
+ * @returns Formatting function that appends units.
+ */
 const getFormatter = <K extends keyof typeof formatCommandsValue>(key: K) =>
   formatCommandsValue[key];
 
+/**
+ * Metadata map describing how to format each supported PID's value.
+ */
 export const OBD_COMMANDS: ObdCommands = {
   RPM: {
     formatValue: getFormatter("rpm"),

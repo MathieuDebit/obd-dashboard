@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Provides the refresh-rate context that maps the selected power mode to
+ * the polling interval used by OBD data hooks throughout the dashboard.
+ */
+
 import { createContext, useContext, useMemo } from "react";
 import type { PropsWithChildren } from "react";
 
@@ -26,6 +31,13 @@ const RefreshRateContext = createContext<RefreshRateContextValue>({
   intervalMs: PERFORMANCE_REFRESH_INTERVAL_MS,
 });
 
+/**
+ * RefreshRateProvider derives the appropriate polling cadence from the current
+ * power mode and exposes it to descendants via context.
+ *
+ * @param props.children - Elements that need access to the refresh interval.
+ * @returns The provider-wrapped subtree that shares refresh settings.
+ */
 export const RefreshRateProvider = ({ children }: PropsWithChildren) => {
   const { mode: powerMode } = usePowerMode();
   const intervalMs = INTERVAL_BY_POWER_MODE[powerMode];
@@ -41,7 +53,18 @@ export const RefreshRateProvider = ({ children }: PropsWithChildren) => {
   );
 };
 
+/**
+ * useRefreshRate exposes the current refresh interval and power mode so hooks
+ * can align network or sensor polling frequency accordingly.
+ *
+ * @returns The refresh rate context value containing interval and power mode.
+ */
 export const useRefreshRate = () => useContext(RefreshRateContext);
+
+/**
+ * refreshRateIntervals lists the hard-coded polling cadences associated with
+ * each power mode for consumers that need static values (e.g. tests).
+ */
 export const refreshRateIntervals = {
   performance: PERFORMANCE_REFRESH_INTERVAL_MS,
   powersave: POWERSAVE_REFRESH_INTERVAL_MS,

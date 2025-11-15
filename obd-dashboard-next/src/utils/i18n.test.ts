@@ -1,3 +1,6 @@
+/**
+ * @file Tests covering locale normalization and translation fallbacks.
+ */
 import {
   DEFAULT_LOCALE,
   getPidCopy,

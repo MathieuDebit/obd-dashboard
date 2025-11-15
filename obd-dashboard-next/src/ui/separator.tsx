@@ -1,8 +1,18 @@
+/**
+ * @file Thin divider component built on Radix Separator.
+ */
 import * as SeparatorPrimitive from "@radix-ui/react-separator"
 import * as React from "react"
 
 import { cn } from "@/utils/classNames"
 
+/**
+ * Separator renders a horizontal or vertical rule with accessible defaults.
+ *
+ * @param props.orientation - Layout orientation for the divider.
+ * @param props.decorative - Whether the separator is purely visual.
+ * @returns Styled separator element.
+ */
 function Separator({
   className,
   orientation = "horizontal",

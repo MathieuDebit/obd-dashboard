@@ -1,3 +1,6 @@
+/**
+ * @file Tests for the useOBD hook covering websocket lifecycle and formatting.
+ */
 import { act, renderHook } from "@testing-library/react";
 
 import useOBD from "./useOBD";
@@ -20,6 +23,9 @@ jest.mock("@/store/pidHistory", () => ({
 type Listener = (event: Partial<MessageEvent<string>>) => void;
 type EventName = "open" | "message" | "error" | "close";
 
+/**
+ * Minimal WebSocket mock used to simulate server events within hooks tests.
+ */
 class MockWebSocket {
   static instances: MockWebSocket[] = [];
   url: string;
@@ -56,20 +62,34 @@ class MockWebSocket {
     this.listeners[type].forEach((listener) => listener(event));
   }
 
+  /**
+   * Simulates the websocket open event.
+   */
   simulateOpen() {
     this.dispatch("open", { type: "open" } as MessageEvent<string>);
   }
 
+  /**
+   * Dispatches a JSON-encoded message event with the supplied payload.
+   *
+   * @param payload - Data object to send to listeners.
+   */
   simulateMessage(payload: unknown) {
     this.dispatch("message", {
       data: JSON.stringify(payload),
     });
   }
 
+  /**
+   * Simulates the socket closing.
+   */
   simulateClose() {
     this.dispatch("close", { type: "close" } as MessageEvent<string>);
   }
 
+  /**
+   * Alias that mirrors the browser close() behavior for consumers.
+   */
   close() {
     this.simulateClose();
   }

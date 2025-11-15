@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * @file Houses an external store that records PID samples for charting and
+ * exposes hooks/utilities for consumers.
+ */
+
 import { useSyncExternalStore } from "react";
 
 import type { OBDServerResponse } from "@/types/commands";
@@ -18,15 +23,32 @@ const historyByPid = new Map<string, PidSample[]>();
 const listeners = new Set<() => void>();
 let isRecording = true;
 
+/**
+ * Notifies every subscribed listener that the history map changed.
+ */
 const emit = () => {
   listeners.forEach((listener) => listener());
 };
 
+/**
+ * Registers a listener to be invoked whenever samples change.
+ *
+ * @param listener - Callback invoked on store updates.
+ * @returns Unsubscribe function.
+ */
 const subscribe = (listener: () => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
 
+/**
+ * Removes samples older than the cutoff or those exceeding the max sample
+ * count.
+ *
+ * @param samples - Mutable array of PID samples.
+ * @param cutoff - Minimum timestamp that should be retained.
+ * @returns True if the samples array was modified.
+ */
 const pruneSamples = (samples: PidSample[], cutoff: number) => {
   let changed = false;
 
@@ -47,6 +69,11 @@ const pruneSamples = (samples: PidSample[], cutoff: number) => {
   return changed;
 };
 
+/**
+ * Records numeric samples from an OBD response when recording is enabled.
+ *
+ * @param response - Parsed server response containing PID values.
+ */
 export function recordPidSamples(response: OBDServerResponse) {
   if (!isRecording) {
     return;
@@ -96,6 +123,12 @@ const EMPTY_SNAPSHOT: PidSample[] = [];
 const getSnapshotForPid = (pid: string | null) =>
   pid ? historyByPid.get(pid) ?? EMPTY_SNAPSHOT : EMPTY_SNAPSHOT;
 
+/**
+ * Subscribes React components to the history for a specific PID.
+ *
+ * @param pid - PID identifier to observe.
+ * @returns Array of samples for the PID.
+ */
 export function usePidHistory(pid: string | null) {
   return useSyncExternalStore<PidSample[]>(
     subscribe,
@@ -104,10 +137,19 @@ export function usePidHistory(pid: string | null) {
   );
 }
 
+/**
+ * Returns a shallow copy of the current PID history array.
+ *
+ * @param pid - PID identifier to fetch.
+ * @returns Array of recorded samples, empty when absent.
+ */
 export function getPidHistory(pid: string) {
   return historyByPid.get(pid)?.slice() ?? [];
 }
 
+/**
+ * Clears every stored PID history entry and notifies subscribers.
+ */
 export function clearPidHistory() {
   if (historyByPid.size === 0) {
     return;
@@ -116,15 +158,26 @@ export function clearPidHistory() {
   emit();
 }
 
+/**
+ * Pauses history recording, typically when the websocket disconnects.
+ */
 export function pausePidHistory() {
   if (!isRecording) return;
   isRecording = false;
 }
 
+/**
+ * Resumes recording after being paused.
+ */
 export function resumePidHistory() {
   if (isRecording) return;
   isRecording = true;
 }
 
+/**
+ * Indicates whether the store is currently recording samples.
+ *
+ * @returns True while recording is enabled.
+ */
 export const isPidHistoryRecording = () => isRecording;
 export const PID_HISTORY_WINDOW_SECONDS = DEFAULT_WINDOW_SECONDS;

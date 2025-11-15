@@ -1,9 +1,15 @@
+/**
+ * @file Shared button component built on top of Radix Slot and CVA utilities.
+ */
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
 import { cn } from "@/utils/classNames"
 
+/**
+ * Style variants for the button component leveraging class-variance-authority.
+ */
 const buttonVariants = cva(
   "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium outline-none transition-all focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
@@ -35,6 +41,16 @@ const buttonVariants = cva(
   }
 )
 
+/**
+ * Button renders a styled button or forwards props to a child component when
+ * `asChild` is provided.
+ *
+ * @param props.className - Additional CSS classes appended to the variant.
+ * @param props.variant - Named style variant (default, ghost, etc.).
+ * @param props.size - Size key controlling padding and height.
+ * @param props.asChild - When true, renders the Slot wrapper and passes props.
+ * @returns A styled button element.
+ */
 function Button({
   className,
   variant,

@@ -1,8 +1,16 @@
+/**
+ * @file Toggle switch component styled on top of Radix Switch primitive.
+ */
 import * as SwitchPrimitive from "@radix-ui/react-switch"
 import * as React from "react"
 
 import { cn } from "@/utils/classNames"
 
+/**
+ * Switch renders an accessible toggle with animated thumb.
+ *
+ * @returns Styled switch root element.
+ */
 function Switch({
   className,
   ...props

@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Declares the theme context responsible for synchronizing the light or
+ * dark preference across the UI and persisting it in local storage.
+ */
+
 import {
   createContext,
   useCallback,
@@ -24,12 +29,25 @@ export const ThemeContext = createContext<ThemeContextValue>({
   },
 });
 
+/**
+ * Determines which theme should be used when initializing the context, falling
+ * back to light mode during SSR or when no preference exists.
+ *
+ * @returns The theme string used to seed state.
+ */
 const getInitialTheme = (): Theme => {
   if (typeof window === "undefined") return "light";
   const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
   return storedTheme === "dark" ? "dark" : "light";
 };
 
+/**
+ * ThemeProvider manages the theme state, mirrors it into DOM classes, and
+ * exposes a setter to consumers.
+ *
+ * @param props.children - Components that rely on theme information.
+ * @returns The provider wrapping the children.
+ */
 export const ThemeProvider = ({ children }: PropsWithChildren) => {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
 

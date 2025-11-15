@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Hosts the Settings page where users can adjust theme, language, power
+ * mode, developer preferences, and placeholder vehicle/OBD options.
+ */
+
 import { useContext } from "react";
 
 import { useDevtoolsPreferences } from "@/app/DevtoolsPreferencesContext";
@@ -23,6 +28,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
 import type { Locale } from "@/utils/i18n";
 import { translateUi } from "@/utils/i18n";
 
+/**
+ * Settings renders configuration tabs for general, vehicle, OBD, and about
+ * sections and wires UI controls to the corresponding context providers.
+ *
+ * @returns The settings page layout tree.
+ */
 export default function Settings() {
     const { theme, changeTheme } = useContext(ThemeContext);
     const { locale, changeLocale } = useLanguage();

@@ -1,5 +1,9 @@
 "use client"
 
+/**
+ * @file Custom scroll area built on Radix primitives with drag scrolling.
+ */
+
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 import * as React from "react"
 
@@ -12,6 +16,12 @@ type ScrollAreaProps = React.ComponentProps<typeof ScrollAreaPrimitive.Root> & {
   >
 }
 
+/**
+ * Utility to assign values to callback or object refs uniformly.
+ *
+ * @param ref - Ref callback or object.
+ * @param value - Node assigned to the ref.
+ */
 const assignRef = <T,>(
   ref: React.Ref<T> | undefined,
   value: T
@@ -30,6 +40,13 @@ type PointerWithCapabilities = PointerEvent & {
   }
 }
 
+/**
+ * ScrollArea wraps content in a scrollable viewport that supports pointer drag
+ * gestures and renders platform-agnostic scrollbars.
+ *
+ * @param props.viewportProps - Additional props applied to the viewport node.
+ * @returns Scroll area root element containing viewport and scrollbars.
+ */
 function ScrollArea({
   className,
   children,
@@ -198,6 +215,12 @@ function ScrollArea({
   )
 }
 
+/**
+ * ScrollBar renders the draggable scrollbar track/thumb for the ScrollArea.
+ *
+ * @param props.orientation - Direction of the scrollbar.
+ * @returns Styled scrollbar component.
+ */
 function ScrollBar({
   className,
   orientation = "vertical",

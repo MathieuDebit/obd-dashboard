@@ -1,27 +1,44 @@
+/**
+ * @file Wrapped Radix Select primitives with project styling and helpers.
+ */
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 import * as React from "react"
 
 import { cn } from "@/utils/classNames"
 
+/**
+ * Root Select component controlling the open state and value.
+ */
 function Select({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot="select" {...props} />
 }
 
+/**
+ * Groups related select items under an optional label.
+ */
 function SelectGroup({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Group>) {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />
 }
 
+/**
+ * Placeholder/value display rendered inside the trigger.
+ */
 function SelectValue({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />
 }
 
+/**
+ * SelectTrigger renders the clickable element that toggles the dropdown.
+ *
+ * @param props.size - Size variant (sm/default).
+ */
 function SelectTrigger({
   className,
   size = "default",
@@ -48,6 +65,11 @@ function SelectTrigger({
   )
 }
 
+/**
+ * SelectContent renders the dropdown surface and viewport.
+ *
+ * @param props.position - Positioning strategy (default popper).
+ */
 function SelectContent({
   className,
   children,
@@ -83,6 +105,9 @@ function SelectContent({
   )
 }
 
+/**
+ * SelectLabel styles group labels within the dropdown.
+ */
 function SelectLabel({
   className,
   ...props
@@ -96,6 +121,9 @@ function SelectLabel({
   )
 }
 
+/**
+ * SelectItem renders an option row with the selected checkmark indicator.
+ */
 function SelectItem({
   className,
   children,
@@ -120,6 +148,9 @@ function SelectItem({
   )
 }
 
+/**
+ * SelectSeparator draws a divider between option groups.
+ */
 function SelectSeparator({
   className,
   ...props
@@ -133,6 +164,9 @@ function SelectSeparator({
   )
 }
 
+/**
+ * SelectScrollUpButton renders the button used to scroll the viewport upward.
+ */
 function SelectScrollUpButton({
   className,
   ...props
@@ -151,6 +185,9 @@ function SelectScrollUpButton({
   )
 }
 
+/**
+ * SelectScrollDownButton renders the button used to scroll the viewport down.
+ */
 function SelectScrollDownButton({
   className,
   ...props

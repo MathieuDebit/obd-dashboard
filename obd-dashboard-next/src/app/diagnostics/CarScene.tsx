@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Contains the interactive Three.js car scene used by the Diagnostics
+ * page, including model loading, material customization, and camera controls.
+ */
+
 import { OrbitControls, Environment } from "@react-three/drei";
 import {
   Canvas,
@@ -38,6 +43,15 @@ interface CarProps {
   carGlassColor: string
 }
 
+/**
+ * Car loads the GLTF model, applies the configured materials, and animates the
+ * wheels while exposing a primitive for placement in the scene graph.
+ *
+ * @param carProps.carBodyColor - Hex string used for the car's primary paint.
+ * @param carProps.carDetailsColor - Color applied to trims and rims.
+ * @param carProps.carGlassColor - Color used for the windshield/glass material.
+ * @returns The rendered GLTF primitive with applied materials.
+ */
 function Car({ carBodyColor, carDetailsColor, carGlassColor }: CarProps) {
   const carRef = useRef<Group>(null!)
 
@@ -117,10 +131,22 @@ function Car({ carBodyColor, carDetailsColor, carGlassColor }: CarProps) {
   return <primitive ref={carRef} object={sceneClone} />
 }
 
+/**
+ * Converts any CSS color value into a #rrggbb hex string suitable for Three.js.
+ *
+ * @param color - CSS color string or color keyword.
+ * @returns Hex representation of the input color.
+ */
 const colorToHex = (color: string) => new Colorjs(color).to('srgb').toString({ format: 'hex' });
 const ENABLE_WHEEL_ROTATION = false;
 const WHEEL_ROTATION_SPEED = 0.7;
 
+/**
+ * CarScene renders the Canvas with the car model and adapts rendering quality
+ * based on power mode and tab visibility to avoid wasting GPU resources.
+ *
+ * @returns The diagnostics scene canvas element.
+ */
 export default function CarScene() {
   const [background, setBackground] = useState('');
   const [isTabVisible, setIsTabVisible] = useState(true);

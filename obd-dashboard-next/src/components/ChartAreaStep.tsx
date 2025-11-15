@@ -1,6 +1,11 @@
 // @ts-nocheck
 "use client"
 
+/**
+ * @file Provides the ChartAreaStep component that wraps Recharts primitives to
+ * render localized area charts with optional multi-axis support.
+ */
+
 // @ts-ignore - Recharts type definitions pull in redux state helpers we exclude
 import {
   Area,
@@ -60,6 +65,12 @@ const defaultSeries: ChartSeriesConfig[] = [
   { dataKey: "value", name: "Value", yAxisId: "left" },
 ]
 
+/**
+ * Converts a UNIX timestamp into a mm:ss label used by the chart axes/tooltip.
+ *
+ * @param value - Timestamp to format.
+ * @returns A mm:ss string or an empty string when the timestamp is invalid.
+ */
 const formatTimestamp = (value: number) => {
   if (typeof value !== "number" || Number.isNaN(value)) {
     return ""
@@ -70,6 +81,19 @@ const formatTimestamp = (value: number) => {
   return `${minutes}:${seconds}`
 }
 
+/**
+ * ChartAreaStep renders a card that contains an area chart plus contextual
+ * metadata such as title, description, unit badges, and tooltip formatting.
+ *
+ * @param props.title - Optional heading rendered above the chart.
+ * @param props.description - Supporting text displayed near the title.
+ * @param props.chartData - Array of time-stamped samples plotted in the chart.
+ * @param props.series - Series configuration describing colors and axes.
+ * @param props.yAxisLeftUnit - Unit label badge for the left axis.
+ * @param props.yAxisRightUnit - Unit label badge for the right axis.
+ * @param props.valueFormatter - Optional formatter for tooltip values.
+ * @returns A styled card containing the responsive chart.
+ */
 export function ChartAreaStep({
   title,
   description,
@@ -226,6 +250,18 @@ type ChartTooltipProps = {
   timeLabel?: string
 }
 
+/**
+ * ChartTooltip customizes the Recharts tooltip with localized time labels and
+ * optional value/unit formatters derived from the chart configuration.
+ *
+ * @param props.active - Whether the tooltip should be visible.
+ * @param props.payload - Data points currently hovered by the user.
+ * @param props.label - Timestamp associated with the tooltip entry.
+ * @param props.valueFormatter - Optional value formatter.
+ * @param props.seriesConfig - Map describing per-series metadata (e.g. units).
+ * @param props.timeLabel - Localized label prefix for the timestamp.
+ * @returns A tooltip node or null when inactive.
+ */
 function ChartTooltip({
   active,
   payload,

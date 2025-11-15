@@ -1,11 +1,26 @@
 'use client';
 
+/**
+ * @file Provides a hook that throttles value updates using timeouts and
+ * requestAnimationFrame to align with animation cadence.
+ */
+
 import { useEffect, useRef, useState } from "react";
 
+/**
+ * Checks whether the window global is available (guards SSR).
+ *
+ * @returns True when running in the browser.
+ */
 const hasWindow = () => typeof window !== "undefined";
 
 /**
- * Debounce updates via requestAnimationFrame to avoid rendering bursts.
+ * Debounces rapid value changes by waiting the supplied delay and then updating
+ * state inside requestAnimationFrame for smoother UI transitions.
+ *
+ * @param value - Latest value that should eventually be propagated.
+ * @param delayMs - Debounce interval before scheduling the RAF update.
+ * @returns The debounced value that only updates after the interval elapses.
  */
 export function useDebouncedRafValue<T>(value: T, delayMs: number) {
   const [state, setState] = useState(value);

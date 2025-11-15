@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Implements the dashboard landing page showing the vehicle map alongside
+ * live telemetry and chart data pulled from the OBD interface.
+ */
+
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 
 import { useRefreshRate } from "@/app/RefreshRateContext";
@@ -12,6 +17,12 @@ import type { ChartConfig, ChartData } from "@/types/chart";
 const chartConfig = {} satisfies ChartConfig;
 const FALLBACK_CHART_FILL = "var(--foreground)";
 
+/**
+ * Home renders the primary dashboard experience, wiring live OBD data into the
+ * map visualization and the telemetry overlay while handling loading states.
+ *
+ * @returns The main home page layout.
+ */
 export default function Home() {
   const { pidMap, error, isLoading } = useOBD();
   const [chartFill, setChartFill] = useState(FALLBACK_CHART_FILL);

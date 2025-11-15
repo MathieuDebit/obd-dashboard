@@ -1,3 +1,7 @@
+/**
+ * @file Implements the WebSocket-based hook that streams OBD data, normalizes
+ * payloads, and exposes helpers for accessing PID metadata.
+ */
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useLanguage } from "@/app/LanguageContext";
@@ -22,6 +26,13 @@ type ConnectionStatus = "idle" | "connecting" | "ready" | "error";
 
 const DEFAULT_RESPONSE: OBDServerResponse = { timestamp: 0, pids: {} };
 
+/**
+ * Normalizes raw PID values into strings or finite numbers for consistent
+ * handling throughout the UI.
+ *
+ * @param value - Unknown value from the OBD payload.
+ * @returns A string or number representation of the PID value.
+ */
 const coercePidValue = (value: unknown): string | number => {
   if (typeof value === "number" && Number.isFinite(value)) {
     return value;
@@ -38,6 +49,13 @@ const coercePidValue = (value: unknown): string | number => {
   return String(value);
 };
 
+/**
+ * Ensures the server response contains sensible defaults for timestamp and
+ * PID mapping, coercing values along the way.
+ *
+ * @param payload - Partial JSON-parsed payload from the websocket.
+ * @returns A normalized response with timestamp and pid map.
+ */
 const normalizeResponse = (
   payload: Partial<OBDServerResponse>,
 ): OBDServerResponse => {
@@ -59,6 +77,13 @@ const normalizeResponse = (
   return { timestamp, pids: normalizedPids };
 };
 
+/**
+ * Converts PID map entries into numeric samples for chart history, ignoring
+ * values that cannot be parsed.
+ *
+ * @param pids - Map of pid -> raw values.
+ * @returns A pid map containing only numeric samples.
+ */
 const extractNumericPidSamples = (
   pids: Record<string, RawPidValue>,
 ): Record<string, number> =>
@@ -73,6 +98,12 @@ const extractNumericPidSamples = (
     return acc;
   }, {});
 
+/**
+ * useOBD manages the websocket connection lifecycle, exposes parsed command
+ * metadata, and streams samples into the PID history store.
+ *
+ * @returns Aggregated connection state plus derived PID collections.
+ */
 export default function useOBD() {
   const [status, setStatus] = useState<ConnectionStatus>("idle");
   const [connectionError, setConnectionError] = useState<Error | null>(null);

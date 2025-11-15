@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @file Implements developer-only instrumentation for profiling React commit
+ * times and rendering a lightweight performance overlay.
+ */
+
 import {
   Profiler,
   useCallback,
@@ -22,6 +27,12 @@ const SAMPLE_WINDOW = 24;
 const FRAME_BUDGET_MS = 16.67;
 const isDev = process.env.NODE_ENV !== "production";
 
+/**
+ * Tracks whether the component tree has mounted on the client, guarding
+ * browser-only APIs.
+ *
+ * @returns True once the component has run on the client.
+ */
 const useIsClient = () => {
   const [isClient, setIsClient] = useState(false);
 
@@ -32,6 +43,11 @@ const useIsClient = () => {
   return isClient;
 };
 
+/**
+ * Measures approximate frames per second using requestAnimationFrame loops.
+ *
+ * @returns The current FPS sample averaged over one second windows.
+ */
 const useFpsMeter = () => {
   const [fps, setFps] = useState(0);
 
@@ -60,6 +76,12 @@ const useFpsMeter = () => {
   return fps;
 };
 
+/**
+ * Collects React Profiler commit durations and exposes stats plus an onRender
+ * handler suitable for the Profiler component.
+ *
+ * @returns The latest commit stats along with the Profiler callback.
+ */
 const useCommitStats = () => {
   const [stats, setStats] = useState<CommitStats>({ average: 0, max: 0 });
   const bufferRef = useRef<number[]>([]);
@@ -88,6 +110,14 @@ const useCommitStats = () => {
   return { stats, onRender };
 };
 
+/**
+ * PerformanceOverlay displays FPS, commit timings, and estimated CPU load in a
+ * small floating panel.
+ *
+ * @param props.fps - Most recent frames-per-second sample.
+ * @param props.stats - React commit timing stats.
+ * @returns Overlay markup summarizing performance metrics.
+ */
 const PerformanceOverlay = ({
   fps,
   stats,
@@ -117,6 +147,13 @@ const PerformanceOverlay = ({
   );
 };
 
+/**
+ * PerformanceProfiler wraps the app shell in a React Profiler and draws an
+ * overlay whenever devtools preferences request it.
+ *
+ * @param props.children - Application subtree to profile.
+ * @returns The wrapped children with optional profiler and overlay.
+ */
 export default function PerformanceProfiler({
   children,
 }: PropsWithChildren) {

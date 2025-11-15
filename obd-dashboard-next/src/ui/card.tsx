@@ -1,7 +1,16 @@
+/**
+ * @file Card primitives used to build consistent surfaces.
+ */
 import type { ComponentProps } from "react"
 
 import { cn } from "@/utils/classNames"
 
+/**
+ * Card renders the root container with padding, border, and rounded corners.
+ *
+ * @param props.className - Additional css classes.
+ * @returns Styled card div.
+ */
 function Card({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
@@ -15,6 +24,11 @@ function Card({ className, ...props }: ComponentProps<"div">) {
   )
 }
 
+/**
+ * CardHeader lays out the header region for titles/actions.
+ *
+ * @returns Styled header div.
+ */
 function CardHeader({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
@@ -28,6 +42,11 @@ function CardHeader({ className, ...props }: ComponentProps<"div">) {
   )
 }
 
+/**
+ * CardTitle styles a heading placed inside a CardHeader.
+ *
+ * @returns Styled title div.
+ */
 function CardTitle({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
@@ -38,6 +57,11 @@ function CardTitle({ className, ...props }: ComponentProps<"div">) {
   )
 }
 
+/**
+ * CardDescription styles supporting text under a title.
+ *
+ * @returns Styled description div.
+ */
 function CardDescription({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
@@ -48,6 +72,11 @@ function CardDescription({ className, ...props }: ComponentProps<"div">) {
   )
 }
 
+/**
+ * CardAction positions elements (e.g., buttons) in the header grid.
+ *
+ * @returns Styled action div.
+ */
 function CardAction({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
@@ -61,6 +90,11 @@ function CardAction({ className, ...props }: ComponentProps<"div">) {
   )
 }
 
+/**
+ * CardContent wraps the main body content with consistent padding.
+ *
+ * @returns Styled content div.
+ */
 function CardContent({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
@@ -71,6 +105,11 @@ function CardContent({ className, ...props }: ComponentProps<"div">) {
   )
 }
 
+/**
+ * CardFooter anchors controls at the bottom of a card.
+ *
+ * @returns Styled footer div.
+ */
 function CardFooter({ className, ...props }: ComponentProps<"div">) {
   return (
     <div

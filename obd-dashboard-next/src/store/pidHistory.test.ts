@@ -1,3 +1,7 @@
+/**
+ * @file Unit tests verifying the PID history store handles recording,
+ * pruning, and pause/resume semantics.
+ */
 import {
   PID_HISTORY_WINDOW_SECONDS,
   clearPidHistory,

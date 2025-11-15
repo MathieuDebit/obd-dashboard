@@ -1,3 +1,7 @@
+/**
+ * @file Smoke tests validating that the Settings page renders its tabs and
+ * primary controls when wrapped with the necessary providers.
+ */
 import { render, screen } from "@testing-library/react";
 
 import { DevtoolsPreferencesProvider } from "@/app/DevtoolsPreferencesContext";
@@ -6,6 +10,11 @@ import { PowerModeProvider } from "@/app/PowerModeContext";
 import Settings from "@/app/settings/page";
 import { ThemeProvider } from "@/app/ThemeContext";
 
+/**
+ * Mounts the Settings page with all of its required context providers.
+ *
+ * @returns The testing-library render result.
+ */
 const renderWithProviders = () =>
   render(
     <LanguageProvider>

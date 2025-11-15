@@ -1,7 +1,13 @@
+/**
+ * @file Table primitives styled to match the dashboard theme.
+ */
 import type { ComponentProps } from "react"
 
 import { cn } from "@/utils/classNames"
 
+/**
+ * Table wraps a table element inside a scrollable container for responsiveness.
+ */
 function Table({ className, ...props }: ComponentProps<"table">) {
   return (
     <div
@@ -17,6 +23,9 @@ function Table({ className, ...props }: ComponentProps<"table">) {
   )
 }
 
+/**
+ * TableHeader styles the table head row section.
+ */
 function TableHeader({ className, ...props }: ComponentProps<"thead">) {
   return (
     <thead
@@ -27,6 +36,9 @@ function TableHeader({ className, ...props }: ComponentProps<"thead">) {
   )
 }
 
+/**
+ * TableBody styles the tbody element.
+ */
 function TableBody({ className, ...props }: ComponentProps<"tbody">) {
   return (
     <tbody
@@ -37,6 +49,9 @@ function TableBody({ className, ...props }: ComponentProps<"tbody">) {
   )
 }
 
+/**
+ * TableFooter highlights summary rows at the bottom of a table.
+ */
 function TableFooter({ className, ...props }: ComponentProps<"tfoot">) {
   return (
     <tfoot
@@ -50,6 +65,9 @@ function TableFooter({ className, ...props }: ComponentProps<"tfoot">) {
   )
 }
 
+/**
+ * TableRow adds hover/selection states for individual rows.
+ */
 function TableRow({ className, ...props }: ComponentProps<"tr">) {
   return (
     <tr
@@ -63,6 +81,9 @@ function TableRow({ className, ...props }: ComponentProps<"tr">) {
   )
 }
 
+/**
+ * TableHead styles header cells with consistent typography.
+ */
 function TableHead({ className, ...props }: ComponentProps<"th">) {
   return (
     <th
@@ -76,6 +97,9 @@ function TableHead({ className, ...props }: ComponentProps<"th">) {
   )
 }
 
+/**
+ * TableCell styles data cells while supporting checkbox layouts.
+ */
 function TableCell({ className, ...props }: ComponentProps<"td">) {
   return (
     <td
@@ -89,6 +113,9 @@ function TableCell({ className, ...props }: ComponentProps<"td">) {
   )
 }
 
+/**
+ * TableCaption renders muted explanatory text below a table.
+ */
 function TableCaption({
   className,
   ...props

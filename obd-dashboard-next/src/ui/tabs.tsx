@@ -1,8 +1,14 @@
+/**
+ * @file Tab primitives with consistent styling.
+ */
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 import * as React from "react"
 
 import { cn } from "@/utils/classNames"
 
+/**
+ * Tabs is the root component that controls active tab state.
+ */
 function Tabs({
   className,
   ...props
@@ -16,6 +22,9 @@ function Tabs({
   )
 }
 
+/**
+ * TabsList renders the container that hosts tab triggers.
+ */
 function TabsList({
   className,
   ...props
@@ -32,6 +41,9 @@ function TabsList({
   )
 }
 
+/**
+ * TabsTrigger renders a clickable tab button with active/disabled styles.
+ */
 function TabsTrigger({
   className,
   ...props
@@ -48,6 +60,9 @@ function TabsTrigger({
   )
 }
 
+/**
+ * TabsContent displays the panel associated with a given tab value.
+ */
 function TabsContent({
   className,
   ...props

@@ -1,7 +1,15 @@
+/**
+ * @file Navigation shortcuts displayed at the top of the app shell.
+ */
 import { Navigation, ChartLine, Wrench, Settings } from "lucide-react";
 import Link from "next/link";
 
 
+/**
+ * Nav renders the icon-based navigation bar linking to main sections.
+ *
+ * @returns Navigation bar markup.
+ */
 export default function Nav() {
     return (
         <div className="h-15 mb-2 flex">
